@@ -23,7 +23,6 @@ function generateVerificationLink(emailVerificationToken) {
   return `https://${process.env.DOMAIN}/verify-email?token=${emailVerificationToken}`;
 }
 
-// Route: POST /auth/register
 // Register a new user
 router.post('/register', async (req, res) => {
   try {
@@ -97,7 +96,6 @@ router.get('/verify-email/:token', async (req, res) => {
 }
 });
 
-// Route: POST /auth/login
 // Login user
 router.post('/login', async (req, res) => {
   try {
@@ -137,6 +135,80 @@ router.post('/login', async (req, res) => {
     console.error('Error logging in user:', error);
     return res.status(500).json({ message: 'Internal server error' });
   }
+});
+
+//Get All Users
+router.get('/users', async (req, res) => {
+  try {
+    const users = await User.find();
+    // Send a response with the token, message, and expiration time
+    return res.status(200).json({
+    });
+} catch (error) {
+    console.error('Error logging in user:', error);
+    return res.status(500).json({ message: 'Login failed.' });
+}
+});
+
+// Get a user by their ID
+router.get('/users/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Find the user by their ID
+    const user = await User.findById(userId);
+
+    if (!user) {
+        return res.status(404).json({ message: 'User not found.' });
+    }
+
+    // Return the user data
+    return res.status(200).json({ user });
+} catch (error) {
+    console.error('Error getting user by ID:', error);
+    return res.status(500).json({ message: 'Failed to get user by ID.' });
+}
+});
+
+// Update user by their ID
+router.put('/update-user/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const updatedUserData = req.body;
+
+    // Find the user by their ID and update their data
+    const updatedUser = await User.findByIdAndUpdate(userId, updatedUserData, { new: true });
+
+    if (!updatedUser) {
+        return res.status(404).json({ message: 'User not found.' });
+    }
+
+    // Return the updated user data
+    return res.status(200).json({ user: updatedUser });
+} catch (error) {
+    console.error('Error updating user by ID:', error);
+    return res.status(500).json({ message: 'Failed to update user by ID.' });
+}
+});
+
+// Delete user by their ID
+router.delete('/delete-user/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Find the user by their ID and delete them
+    const deletedUser = await User.findByIdAndDelete(userId);
+
+    if (!deletedUser) {
+        return res.status(404).json({ message: 'User not found.' });
+    }
+
+    // Return a success message
+    return res.status(200).json({ message: 'User deleted successfully.' });
+} catch (error) {
+    console.error('Error deleting user by ID:', error);
+    return res.status(500).json({ message: 'Failed to delete user by ID.' });
+}
 });
 
 module.exports = router;
