@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');;
 const dbConfig = require('./config/db');
 const cors = require('cors');
+const authRoute = require('./routes/authRoutes');
 
 
 const app = express();
@@ -25,8 +26,10 @@ app.use(bodyParser.json());
 
 // Welcome route
 app.get('/', (req, res) => {
-  res.send('Welcome to Heda Healing! Your source for holistic well-being.');
+  res.send('Welcome to Spinflame! Your source for Events.');
 });
+
+app.use("/api/v1/auth", authRoute);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

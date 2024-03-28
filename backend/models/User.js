@@ -28,6 +28,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  profilePicture: {
+    type: String,
+    default: "https://placehold.co/500x500",
+  },
   bio: String,
   profilePicture: String,
   socialLinks: {
@@ -43,6 +47,12 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  emailVerified: {
+    type: Boolean,
+    default: false
+  },
+  verificationToken: String,
+  emailVerificationExpire: Date,
   // Timestamps for createdAt and updatedAt
 }, { timestamps: true });
 
