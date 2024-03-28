@@ -4,6 +4,7 @@ const router = express.Router();
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const transporter = require('../config/nodemailer');
+const authMiddleware = require('../middlewares/authMiddleware');
 
 // Function to generate an email verification token
 function generateVerificationToken() {
@@ -138,7 +139,7 @@ router.post('/login', async (req, res) => {
 });
 
 //Get All Users
-router.get('/users', async (req, res) => {
+router.get('/users', authMiddleware, async (req, res) => {
   try {
     const users = await User.find();
     // Send a response with the token, message, and expiration time
