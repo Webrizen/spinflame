@@ -4,11 +4,39 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');;
 const dbConfig = require('./config/db');
 const cors = require('cors');
+const http = require('http');
+const socketIo = require('socket.io');
 const authRoute = require('./routes/authRoutes');
 
 
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
 const PORT = process.env.PORT || 3001;
+
+io.on('connection', (socket) => {
+  // Emit event when a participant joins the room
+socket.on('participantJoined', (roomId, participant) => {
+  io.to(roomId).emit('participantJoined', participant);
+});
+
+// Emit event when the event starts
+socket.on('eventStart', (roomId) => {
+  io.to(roomId).emit('eventStart');
+});
+
+// Emit event when the event ends
+socket.on('eventEnd', (roomId) => {
+  io.to(roomId).emit('eventEnd');
+});
+
+// Emit event when winner is announced
+socket.on('winnerAnnounced', (roomId, winner) => {
+  io.to(roomId).emit('winnerAnnounced', winner);
+});
+
+});
+
 
 // Allow all origins during development, replace with specific origin in production
 app.use(cors());
