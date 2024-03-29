@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from '@/components/system/Navbar';
 import { ThemeProvider } from '@/providers/theme-provider';
 import { Toaster } from "@/components/ui/toaster"
+import AuthProvider from '@/providers/AuthProvider';
 
 const dmSans = DM_Sans({ subsets: ["latin"] });
 
@@ -21,9 +22,11 @@ export default function RootLayout({ children }) {
           defaultTheme="system"
           enableSystem
         >
-          <Navbar />
-          {children}
-          <Toaster />
+          <AuthProvider>
+            <Navbar />
+            {children}
+            <Toaster />
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
