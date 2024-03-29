@@ -1,7 +1,11 @@
+import Hero from "@/components/design/Hero";
+
 export default function Home() {
   return (
-    <h1 className="text-3xl font-bold underline">
-      Hello world!
-    </h1>
+    <>
+      <section className="w-full min-h-screen">
+        <Hero />
+      </section>
+    </>
   )
 }
