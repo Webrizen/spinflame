@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import axios from 'axios';
 import { useToast } from '@/components/ui/use-toast';
@@ -14,11 +14,8 @@ export default function page() {
 
     // Function to handle email verification
     useEffect(() => {
-
-        // Make a request to the API endpoint for email verification
         axios.get(`${process.env.NEXT_PUBLIC_BASEURL}/auth/verify-email/${token}`)
             .then(response => {
-                // If verification is successful
                 setVerificationStatus('success');
                 toast({
                     title: "Email verified successfully! ",
@@ -27,7 +24,6 @@ export default function page() {
                 router.push('/auth');
             })
             .catch(error => {
-                // If verification fails
                 setVerificationStatus('error');
                 toast({
                     variant: "destructive",
@@ -36,13 +32,13 @@ export default function page() {
                 })
             })
             .finally(() => {
-                // Update loading state
                 setIsLoading(false);
             });
     }, [token]);
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen">
+        <Suspense>
+            <div className="flex flex-col items-center justify-center min-h-screen">
             {isLoading ? (
                 <p className='flex flex-row items-center text-center text-xl'>
                 <svg
@@ -77,5 +73,6 @@ export default function page() {
                 </div>
             )}
         </div>
+        </Suspense>
     );
 }

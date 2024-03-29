@@ -1,20 +1,20 @@
 "use client";
 import { useState } from "react";
 import {
-    NavigationMenu,
-    NavigationMenuContent,
-    NavigationMenuItem,
-    NavigationMenuLink,
-    NavigationMenuList,
-    NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
+    Avatar,
+    AvatarFallback,
+    AvatarImage,
+} from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useUserContext } from "@/context/UserContext";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
@@ -22,6 +22,7 @@ import Link from "next/link";
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { setTheme } = useTheme();
+    const { user, logout } = useUserContext();
     return (
         <>
             <header
@@ -105,9 +106,31 @@ export default function Navbar() {
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
-                        <Button className="ml-1" asChild>
-                            <Link href="/auth">Login</Link>
-                        </Button>
+                        {(user ? (
+                            <>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger>
+                                        <Avatar className="w-10 h-10 rounded-xl cursor-pointer backdrop-blur-3xl hover:bg-[rgba(0,0,0,0.04)] flex justify-center items-center">
+                                            <AvatarImage src="https://www.aapda.in/male.png" alt="@user" />
+                                            <AvatarFallback>US</AvatarFallback>
+                                        </Avatar>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="mb-5">
+                                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem><Link href="/auth/orders" className="w-full">Orders</Link></DropdownMenuItem>
+                                        <DropdownMenuItem><Link href="/support" className="w-full">Report Issues</Link></DropdownMenuItem>
+                                        <DropdownMenuItem className="bg-red-50 text-red-400 cursor-pointer" onClick={logout}>Logout</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </>
+                        ) : (
+                            <>
+                                <Button variant="outline" className="text-sm ml-1" asChild>
+                                    <Link href="/auth">Login</Link>
+                                </Button>
+                            </>
+                        ))}
                         <button
                             className="inline-flex w-10 h-10 justify-center items-center hover:bg-slate-100 dark:hover:bg-[rgba(225,225,225,0.1)] rounded lg:hidden"
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
