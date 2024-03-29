@@ -14,7 +14,7 @@ export default function page() {
     return (
         <>
             <div className="container relative md:min-h-screen h-screen flex flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-                <Button variant="ghost" className="absolute right-4 top-4 md:right-8 md:top-8" onClick={toggleForm}>
+                <Button variant="ghost" className="absolute right-4 top-24 md:right-8 md:top-8" onClick={toggleForm}>
                 {isNewUser ? 'New User? Signup here!' : 'Already have an account? Login here!'}
                 </Button>
                 <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r dark:border-slate-700">
