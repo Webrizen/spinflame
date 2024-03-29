@@ -1,5 +1,7 @@
 import { DM_Sans } from 'next/font/google'
 import "./globals.css";
+import Navbar from '@/components/system/Navbar';
+import { ThemeProvider } from '@/providers/theme-provider';
 
 const dmSans = DM_Sans({ subsets: ["latin"] });
 
@@ -12,7 +14,16 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={dmSans.className} suppressHydrationWarning>{children}</body>
+      <body className={dmSans.className} suppressHydrationWarning>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+        >
+          <Navbar />
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
