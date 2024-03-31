@@ -131,6 +131,7 @@ router.post('/login', async (req, res) => {
       token: token,
     isPro: user.isPro,
     isEmailVerified: user.emailVerified,
+    user: user,
       message: 'Login successful.',
       expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRES,
   });
