@@ -43,8 +43,8 @@ export function UserLoginForm({ className, ...props }) {
             console.error('Login error:', error);
             toast({
                 variant: "destructive",
-                title: `${error.message} - Login unsuccessful`,
-                description: `${error.response.data.message} - At ${new Date()}, our system detected a new login try from your IP.`,
+                title: `${error.response.data.message} - Login unsuccessful`,
+                description: `${error.message} - At ${new Date()}, our system detected a new login try from your IP.`,
             })
             setIsLoading(false);
         }
