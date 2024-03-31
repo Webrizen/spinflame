@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { format } from "date-fns"
+import { format, isBefore, isToday } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -12,8 +12,17 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-export default function DatePicker() {
+export default function DatePicker({ onSelectDate  }) {
   const [date, setDate] = React.useState();
+  const handleDateSelect = (selectedDate) => {
+    if (!isBefore(selectedDate, new Date()) || isToday(selectedDate)) {
+      setDate(selectedDate);
+      onSelectDate(selectedDate);
+    } else {
+      console.error("Selected date must be today or a future date");
+      alert("Selected date must be today or a future date");
+    }
+  }
 
   return (
     <Popover>
@@ -33,7 +42,7 @@ export default function DatePicker() {
         <Calendar
           mode="single"
           selected={date}
-          onSelect={setDate}
+          onSelect={handleDateSelect}
           initialFocus
         />
       </PopoverContent>

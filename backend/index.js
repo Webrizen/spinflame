@@ -7,6 +7,7 @@ const cors = require('cors');
 const http = require('http');
 const socketIo = require('socket.io');
 const authRoute = require('./routes/authRoutes');
+const roomRoutes = require('./routes/roomRoutes');
 
 
 const app = express();
@@ -58,6 +59,7 @@ app.get('/', (req, res) => {
 });
 
 app.use("/api/v1/auth", authRoute);
+app.use("/api/v1/events", roomRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
