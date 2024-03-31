@@ -118,8 +118,8 @@ export default function Navbar() {
                                     <DropdownMenuContent align="end" className="mb-5">
                                         <DropdownMenuLabel>My Account</DropdownMenuLabel>
                                         <DropdownMenuSeparator />
-                                        <DropdownMenuItem><Link href="/auth/orders" className="w-full">Orders</Link></DropdownMenuItem>
-                                        <DropdownMenuItem><Link href="/support" className="w-full">Report Issues</Link></DropdownMenuItem>
+                                        <DropdownMenuItem><Link href="/dashboard" className="w-full">Dashboard</Link></DropdownMenuItem>
+                                        <DropdownMenuItem><Link href="/dashboard/create-event" className="w-full">Create Event</Link></DropdownMenuItem>
                                         <DropdownMenuItem className="bg-red-50 text-red-400 cursor-pointer" onClick={logout}>Logout</DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>

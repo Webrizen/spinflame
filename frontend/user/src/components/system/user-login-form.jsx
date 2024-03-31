@@ -37,7 +37,7 @@ export function UserLoginForm({ className, ...props }) {
             })
             login(response.data);
             setIsLoading(false);
-            router.push('/');
+            router.push('/dashboard');
         } catch (error) {
             // Handle login errors
             console.error('Login error:', error);
