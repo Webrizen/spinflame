@@ -129,6 +129,7 @@ router.post('/login', async (req, res) => {
       userId: user._id,
       role: user.role,
       token: token,
+    isPro: user.isPro,
       message: 'Login successful.',
       expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRES,
   });
