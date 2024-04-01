@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Room = require('../models/Room');
 
+module.exports = function(io) {
 // Create a new room
 router.post('/rooms', async (req, res) => {
   try {
@@ -78,4 +79,5 @@ router.delete('/rooms/:id', async (req, res) => {
   }
 });
 
-module.exports = router;
+return router;
+}
