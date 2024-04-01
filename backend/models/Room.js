@@ -13,7 +13,6 @@ const roomSchema = new mongoose.Schema({
   participants: [{
     name: {
       type: String,
-      required: true
     }
   }],
   maxParticipants: {
@@ -34,7 +33,6 @@ const roomSchema = new mongoose.Schema({
   },
   endDate: {
     type: Date,
-    required: true
   },
 }, { timestamps: true });
 
