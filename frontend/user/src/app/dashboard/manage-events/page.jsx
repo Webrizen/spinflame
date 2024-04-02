@@ -1,8 +1,21 @@
+"use client";
 import React from 'react';
 import { Button } from "@/components/ui/button";
+import { useUserContext } from '@/context/UserContext';
 import { Input } from "@/components/ui/input";
 
-export default function page() {
+async function getData({ userId }) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASEURL}/events/rooms/user/${userId}`)
+    if (!res.ok) {
+      throw new Error('Failed to fetch data')
+    }
+    return res.json()
+  }
+
+export default async function page() {
+    const { user } = useUserContext();
+    const userId = user.id;
+    const data = await getData({ userId });
     return (
         <section className='w-full min-h-screen pb-16'>
             <div className="flex w-full items-center space-x-2">

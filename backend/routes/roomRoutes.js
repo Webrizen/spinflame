@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Room = require('../models/Room');
+const User = require('../models/User');
 
 // Create a new room
 router.post('/rooms', async (req, res) => {
@@ -37,6 +38,18 @@ router.get('/rooms/:id', async (req, res) => {
     res.json(room);
   } catch (error) {
     console.error('Error fetching room by ID:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Get rooms by user ID
+router.get('/rooms/user/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const rooms = await Room.find({ creator: userId });
+    res.json(rooms);
+  } catch (error) {
+    console.error('Error fetching rooms by user ID:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
