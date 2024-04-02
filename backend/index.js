@@ -15,6 +15,8 @@ const server = http.createServer(app);
 const io = socketIo(server);
 const PORT = process.env.PORT || 3001;
 
+
+app.set('io', io);
 io.on('connection', (socket) => {
   // Emit event when a participant joins the room
 socket.on('participantJoined', (roomId, participant) => {
@@ -59,7 +61,7 @@ app.get('/', (req, res) => {
 });
 
 app.use("/api/v1/auth", authRoute);
-app.use("/api/v1/events", roomRoutes(io));
+app.use("/api/v1/events", roomRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
