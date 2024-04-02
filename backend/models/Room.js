@@ -47,7 +47,7 @@ roomSchema.pre('save', async function(next) {
       this.maxParticipants = Infinity;
     } else {
       // If the creator is not a pro user, use the default maximum participant limit
-      this.maxParticipants = 100;
+      this.maxParticipants = 50;
     }
 
     next();

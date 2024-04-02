@@ -34,8 +34,10 @@ export default function CreateEvent() {
     };
 
     const handleMaxParticipantsChange = (event) => {
-        setMaxParticipants(event.target.value);
+        const value = parseInt(event.target.value, 10);
+        setMaxParticipants(value);
     };
+    
 
     const handleStartDateSelect = (date) => {
         setStartDate(date);
@@ -105,7 +107,7 @@ export default function CreateEvent() {
                                 min="0"
                                 type="number"
                                 max={isPro ? '' : '50'}
-                                value={maxParticipants}
+                                value={maxParticipants || ''}
                                 onChange={handleMaxParticipantsChange}
                                 disabled={!isPro}
                             />
