@@ -89,7 +89,7 @@ export default function CreateEvent() {
                     <p className="text-gray-500 dark:text-gray-400">Fill out the form below to create your event.</p>
                 </div>
                 <div className="space-y-4 flex justify-center flex-col">
-                    <div className="grid grid-cols-4 gap-4 w-full">
+                    <div className="grid md:grid-cols-4 grid-cols-1 gap-4 w-full">
                         <div className="space-y-2">
                             <Label htmlFor="event-name">Event Name</Label>
                             <Input id="event-name" placeholder="Enter the event name" value={eventName} disabled={loading} onChange={handleEventNameChange} />

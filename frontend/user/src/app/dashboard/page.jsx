@@ -118,15 +118,15 @@ export default function page() {
                 </Card>
             </div>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <Card className="col-span-4">
+                <Card className="md:col-span-4">
                     <CardHeader>
                         <CardTitle>Overview</CardTitle>
                     </CardHeader>
-                    <CardContent className="pl-2">
+                    <CardContent className="md:pl-2 pl-0">
                         <Overview />
                     </CardContent>
                 </Card>
-                <Card className="col-span-3">
+                <Card className="md:col-span-3">
                     <CardHeader>
                         <CardTitle>Recent Winners From Your Events</CardTitle>
                         <CardDescription>

@@ -101,7 +101,7 @@ export default function ManageEvents() {
 
     return (
         <section className='w-full min-h-screen pb-16'>
-            <div className="flex w-full items-center space-x-2">
+            <div className="flex w-full items-center space-x-2 md:mt-0 mt-2">
                 <Input type="search" placeholder="Search Events By Title" className="w-full" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
                 <div className="inline-flex w-10 h-10 justify-center items-center dark:bg-[rgba(225,225,225,0.08)] bg-[rgba(0,0,0,0.05)] hover:bg-slate-100 dark:hover:bg-[rgba(225,225,225,0.1)] rounded-xl cursor-pointer">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -109,7 +109,7 @@ export default function ManageEvents() {
                     </svg>
                 </div>
             </div>
-            <div className='grid grid-cols-4 gap-4 my-3'>
+            <div className='grid md:grid-cols-4 grid-cols-1 gap-4 my-3'>
                 {loading ? (
                     [...Array(7)].map((item, index) => (
                         <div className='w-full flex flex-col gap-2'>
