@@ -12,8 +12,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-export default function DatePicker({ onSelectDate  }) {
-  const [date, setDate] = React.useState();
+export default function DatePicker({ onSelectDate, value }) {
+  const [date, setDate] = React.useState(value || null);
+
+
+  React.useEffect(() => {
+    setDate(value || null);
+  }, [value]);
+
   const handleDateSelect = (selectedDate) => {
     if (!isBefore(selectedDate, new Date()) || isToday(selectedDate)) {
       setDate(selectedDate);

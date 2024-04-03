@@ -63,8 +63,6 @@ router.put('/rooms/:id', async (req, res) => {
     if (!updatedRoom) {
       return res.status(404).json({ message: 'Room not found' });
     }
-    // Emit Socket.io event when a room is updated
-    io.emit('roomUpdated', updatedRoom);
     res.json(updatedRoom);
   } catch (error) {
     console.error('Error updating room:', error);
