@@ -8,12 +8,8 @@ const sidebarNavItems = [
     href: "/dashboard/settings",
   },
   {
-    title: "Account",
-    href: "/dashboard/settings/account",
-  },
-  {
-    title: "Appearance",
-    href: "/dashboard/settings/appearance",
+    title: "Billings",
+    href: "/dashboard/settings/billings",
   },
   {
     title: "Notifications",
