@@ -2,6 +2,7 @@
 import { SpinWheel } from 'spin-wheel-game';
 import Audience from './Audience';
 import Link from 'next/link';
+import EventCreator from './EventCreator';
 
 const randomNames = [
   "Alice", "Bob", "Charlie", "David", "Emma", "Frank", "Grace", "Henry", "Isabella", "Jack",
@@ -52,14 +53,10 @@ function formatTimeAgo(timestamp) {
 
 
 const SpinWheelArea = ({ data }) => {
-
-  console.log(data);
-
   const handleSpinFinish = (result) => {
     console.log(`Spun to: ${result}`);
     alert(`${result}`);
   };
-
   const spinWheelProps = {
     segments,
     onFinished: handleSpinFinish,
@@ -97,16 +94,7 @@ const SpinWheelArea = ({ data }) => {
             </div>
             <p className='text-sm dark:text-slate-300 text-slate-500'>{data?.description}</p>
           </div>
-          <Link href={`/Arshahdul_ahmed`} className='w-full dark:bg-[rgba(225,225,225,0.1)] bg-[rgba(0,0,0,0.01)] border dark:border-[rgba(225,225,225,0.1)] border-[rgba(0,0,0,0.1)] py-2 px-2 rounded-lg backdrop-blur-3xl grid grid-cols-[.5fr_1fr] gap-2'>
-            <div className='w-full'>
-              <img src="https://placehold.co/500x500" alt='Creator' className='w-full h-auto aspect-square rounded-xl border dark:border-[rgba(225,225,225,0.1)] border-[rgba(0,0,0,0.1)]' />
-            </div>
-            <div className='w-full flex flex-col p-1'>
-              <h1 className='text-md font-bold'>Arshahdul Ahmed</h1>
-              <p className='text-sm dark:text-slate-300 text-slate-500'>@Arshahdul_ahmed</p>
-              <span className='text-xs dark:text-slate-500'>joined 2years ago</span>
-            </div>
-          </Link>
+          <EventCreator id={data?.creator} />
           <div className='w-full h-full dark:bg-[rgba(225,225,225,0.1)] bg-[rgba(0,0,0,0.01)] border dark:border-[rgba(225,225,225,0.1)] border-[rgba(0,0,0,0.1)] rounded-lg backdrop-blur-3xl'>
             <img src="https://placehold.co/600x400?text=Ad" alt='Creator' className='w-full h-full object-cover rounded-xl border dark:border-[rgba(225,225,225,0.1)] border-[rgba(0,0,0,0.1)]' />
           </div>
