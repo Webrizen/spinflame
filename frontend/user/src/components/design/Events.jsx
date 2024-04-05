@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import axios from 'axios';
 import Link from 'next/link';
 import CountdownTimer from '../design/CountdownTimer';
+import Creator from './Creator';
 
 const gradients = [
     'bg-gradient-to-r from-violet-600 to-indigo-600',
@@ -74,46 +75,48 @@ export default function Events() {
     // Function to filter events based on search query
     const filteredEvents = data ? data.filter(event => event.name.toLowerCase().includes(searchQuery.toLowerCase())) : [];
 
-  return (
-    <section className='w-full min-h-screen pb-16 pt-12'>
+    return (
+        <section className='w-full min-h-screen pb-16 pt-12'>
             <div className='container mx-auto'>
-            <div className="flex w-full items-center space-x-2 md:mt-0 mt-2">
-                <Input type="search" placeholder="Search Events By Title" className="w-full" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-                <div className="inline-flex w-10 h-10 justify-center items-center dark:bg-[rgba(225,225,225,0.08)] bg-[rgba(0,0,0,0.05)] hover:bg-slate-100 dark:hover:bg-[rgba(225,225,225,0.1)] rounded-xl cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                    </svg>
+                <div className="flex w-full items-center space-x-2 md:mt-0 mt-2">
+                    <Input type="search" placeholder="Search Events By Title" className="w-full" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+                    <div className="inline-flex w-10 h-10 justify-center items-center dark:bg-[rgba(225,225,225,0.08)] bg-[rgba(0,0,0,0.05)] hover:bg-slate-100 dark:hover:bg-[rgba(225,225,225,0.1)] rounded-xl cursor-pointer">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                        </svg>
+                    </div>
+                </div>
+                <div className='grid md:grid-cols-4 grid-cols-1 gap-4 my-4'>
+                    {loading ? (
+                        [...Array(7)].map((item, index) => (
+                            <div className='w-full flex flex-col gap-2'>
+                                <div className='h-[150px] w-full dark:bg-slate-500 bg-slate-200 animate-pulse rounded-xl'></div>
+                                <div className='h-4 w-full dark:bg-slate-500 bg-slate-200 animate-pulse rounded-md'></div>
+                                <div className='h-2 w-full dark:bg-slate-500 bg-slate-200 animate-pulse rounded-md'></div>
+                            </div>
+                        ))
+                    ) : (
+                        filteredEvents.map((item, index) => (
+                            <Link href={`/events/${item._id}`} key={index} className='w-full flex flex-col gap-2'>
+                                <div className={`h-[150px] w-full rounded-xl ${getRandomGradient()} relative overflow-hidden`}>
+                                    <div className="absolute top-0 left-0 p-2 cursor-pointer bg-emerald-50 hover:bg-emerald-100 text-emerald-500 rounded-br-xl z-50" title="Time left to start event">
+                                        <CountdownTimer timestamp={item.startDate} />
+                                    </div>
+                                </div>
+                                <h1 className='px-2 text-xl font-bold'>{item.name || "..."}</h1>
+                                <div className='w-full flex flex-row gap-2 px-2 items-center text-xs whitespace-nowrap dark:text-slate-500'>
+                                    <Creator id={item.creator} />
+                                    <span>•</span>
+                                    <span>{formatTimeAgo(item.createdAt)}</span>
+                                    <span>•</span>
+                                    <span>{item.maxParticipants} participants</span>
+                                </div>
+                                <p className='px-2 text-sm line-clamp-3'>{item.description || '...'}</p>
+                            </Link>
+                        ))
+                    )}
                 </div>
             </div>
-            <div className='grid md:grid-cols-4 grid-cols-1 gap-4 my-4'>
-                {loading ? (
-                    [...Array(7)].map((item, index) => (
-                        <div className='w-full flex flex-col gap-2'>
-                            <div className='h-[150px] w-full dark:bg-slate-500 bg-slate-200 animate-pulse rounded-xl'></div>
-                            <div className='h-4 w-full dark:bg-slate-500 bg-slate-200 animate-pulse rounded-md'></div>
-                            <div className='h-2 w-full dark:bg-slate-500 bg-slate-200 animate-pulse rounded-md'></div>
-                        </div>
-                    ))
-                ) : (
-                    filteredEvents.map((item, index) => (
-                        <Link href={`/events/${item._id}`} key={index} className='w-full flex flex-col gap-2'>
-                            <div className={`h-[150px] w-full rounded-xl ${getRandomGradient()} relative overflow-hidden`}>
-                                <div className="absolute top-0 left-0 p-2 cursor-pointer bg-emerald-50 hover:bg-emerald-100 text-emerald-500 rounded-br-xl z-50" title="Time left to start event">
-                                    <CountdownTimer timestamp={item.startDate} />
-                                </div>
-                            </div>
-                            <h1 className='px-2 text-xl font-bold'>{item.name || "..."}</h1>
-                            <div className='w-full flex flex-row gap-2 px-2 items-center text-xs whitespace-nowrap dark:text-slate-500'>
-                                <span>{formatTimeAgo(item.createdAt)}</span>
-                                <span>•</span>
-                                <span>{item.maxParticipants} participants</span>
-                            </div>
-                            <p className='px-2 text-sm line-clamp-3'>{item.description || '...'}</p>
-                        </Link>
-                    ))
-                )}
-            </div>
-            </div>
         </section>
-  )
+    )
 }
