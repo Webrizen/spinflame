@@ -54,6 +54,29 @@ router.get('/rooms/user/:userId', async (req, res) => {
   }
 });
 
+// GET participants for a specific event room
+router.get('/:eventId/participants', async (req, res) => {
+  try {
+    const eventId = req.params.eventId;
+
+    // Find the event room by ID
+    const room = await Room.findById(eventId);
+
+    if (!room) {
+      return res.status(404).json({ message: 'Event room not found' });
+    }
+
+    // Extract participant names from the room's participants array
+    const participants = room.participants.map(participant => participant.name);
+
+    res.json({ participants });
+  } catch (error) {
+    console.error('Error fetching participants:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
 // Update a room by ID
 router.put('/rooms/:id', async (req, res) => {
   try {

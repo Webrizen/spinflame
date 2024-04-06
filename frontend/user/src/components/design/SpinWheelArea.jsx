@@ -1,29 +1,23 @@
 "use client";
+import React, { useEffect, useState } from 'react';
 import { SpinWheel } from 'spin-wheel-game';
 import Audience from './Audience';
-import Link from 'next/link';
 import EventCreator from './EventCreator';
+import { io } from "socket.io-client";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogAction,
+  AlertDialogFooter,
+  AlertDialogTitle
+} from "@/components/ui/alert-dialog";
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
+import axios from "axios";
 
-const randomNames = [
-  "Alice", "Bob", "Charlie", "David", "Emma", "Frank", "Grace", "Henry", "Isabella", "Jack",
-  "Kate", "Liam", "Mia", "Noah", "Olivia", "Peter", "Quinn", "Rose", "Samuel", "Tina",
-  "Uma", "Vincent", "Wendy", "Xavier", "Yara", "Zane"
-];
-
-// Generate random colors for the segments
-const getRandomColor = () => {
-  const letters = '0123456789ABCDEF';
-  let color = '#';
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-};
-
-const segments = randomNames.map((name, index) => ({
-  segmentText: name,
-  segColor: getRandomColor()
-}));
+const socket = io.connect(`${process.env.NEXT_PUBLIC_BASEURL_SOCKET || 'http://localhost:5000'}`);
 
 function formatTimeAgo(timestamp) {
   const currentDate = new Date();
@@ -51,19 +45,85 @@ function formatTimeAgo(timestamp) {
   }
 }
 
+// Generate random colors for the segments
+const getRandomColor = () => {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+};
 
-const SpinWheelArea = ({ data }) => {
+const SpinWheelArea = ({ data, eventId }) => {
+  const roomId = eventId;
+  const [participants, setParticipants] = useState([]);
+
   const handleSpinFinish = (result) => {
     console.log(`Spun to: ${result}`);
     alert(`${result}`);
   };
+
+
+  useEffect(() => {
+    // Fetch initial participant data upon component mounting
+    const fetchParticipants = async () => {
+      try {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BASEURL}/events/${eventId}/participants`);
+        setParticipants(response.data.participants);
+      } catch (error) {
+        console.error('Error fetching participants:', error);
+      }
+    };
+
+    fetchParticipants();
+
+    // Set up event listeners for socket.io
+    socket.on('connect', () => {
+      console.log('Connected to Socket.io server');
+    });
+
+    // Socket.IO event listeners for participant joining and leaving
+    socket.on('participantJoined', (participantName) => {
+      setParticipants(prevParticipants => [...prevParticipants, participantName]);
+    });
+
+    socket.on('participantLeft', (participantName) => {
+      setParticipants(prevParticipants =>
+        prevParticipants.filter(participant => participant !== participantName)
+      );
+    });
+
+    // Cleanup socket event listeners on component unmount
+    return () => {
+      socket.off('participantJoined');
+      socket.off('participantLeft');
+    };
+  }, [eventId]);
+
+  // Function to handle participant joining
+  const handleParticipantJoin = (name) => {
+    socket.emit('participantJoined', roomId, name);
+  };
+
+  // Example form submission
+  const handleFormSubmit = (event) => {
+    event.preventDefault();
+    const participantName = event.target.elements.name.value;
+    handleParticipantJoin(participantName);
+  };
+
+  // Generate segments for the SpinWheel component based on participant names
+  const segments = participants?.map((participant, index) => ({
+    segmentText: participant,
+    segColor: getRandomColor()
+  }));
   const spinWheelProps = {
-    segments,
     onFinished: handleSpinFinish,
     primaryColor: 'black',
     contrastColor: 'white',
     buttonText: 'Spin',
-    isOnlyOnce: false,
+    isOnlyOnce: true,
     size: 300,
     upDuration: 50,
     downDuration: 600,
@@ -75,14 +135,35 @@ const SpinWheelArea = ({ data }) => {
 
   return (
     <section className='w-full min-h-screen flex flex-col md:mt-0 mt-16'>
+      <AlertDialog defaultOpen={true}>
+        <AlertDialogContent>
+          <form onSubmit={handleFormSubmit}>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Join Event {data?.name}.</AlertDialogTitle>
+              <AlertDialogDescription>
+                <Input type="text" name="name" placeholder="Enter your name" className="w-full" />
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="mt-2">
+              <AlertDialogAction><Button type="submit" className="w-auto">Join Event</Button></AlertDialogAction>
+            </AlertDialogFooter>
+          </form>
+        </AlertDialogContent>
+      </AlertDialog>
       <div className='p-2 md:grid md:grid-cols-[.4fr_1fr_.4fr] md:h-[50vh] flex flex-col justify-center items-center gap-2'>
         <div className='w-full h-full px-3 py-4 dark:bg-[rgba(225,225,225,0.1)] relative bg-[rgba(0,0,0,0.05)] rounded-xl flex md:flex-col flex-row md:items-start items-center justify-start gap-2 md:overflow-y-auto overflow-x-auto'>
           <div className='w-full dark:bg-[rgba(225,225,225,0.1)] bg-[rgba(0,0,0,0.1)] border dark:border-[rgba(225,225,225,0.1)] border-[rgba(0,0,0,0.1)] py-2 px-3 rounded-lg sticky top-2 backdrop-blur-3xl md:whitespace-normal whitespace-nowrap'>Live 🔴</div>
-          {randomNames.map((name, index) => (
-            <Audience key={index} name={name} />
+          {participants.map((participant, index) => (
+            <Audience key={index} name={participant} />
           ))}
         </div>
-        <div className='w-full h-full flex justify-center items-center md:overflow-visible overflow-auto'><SpinWheel {...spinWheelProps} /></div>
+        <div className='w-full h-full flex justify-center items-center md:overflow-visible overflow-auto'>
+          {segments.length > 0 ? (
+            <SpinWheel segments={segments} {...spinWheelProps} />
+          ) : (
+            <>Loading...</>
+          )}
+        </div>
         <div className='w-full h-full p-3 dark:bg-[rgba(225,225,225,0.1)] relative bg-[rgba(0,0,0,0.05)] rounded-xl flex flex-col gap-2'>
           <div className='w-full dark:bg-[rgba(225,225,225,0.1)] bg-[rgba(0,0,0,0.1)] border dark:border-[rgba(225,225,225,0.1)] border-[rgba(0,0,0,0.1)] py-2 px-3 rounded-lg backdrop-blur-3xl'>Event & Creator Info</div>
           <div className='w-full flex flex-col gap-2 px-2'>

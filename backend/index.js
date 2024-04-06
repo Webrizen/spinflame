@@ -5,44 +5,88 @@ const bodyParser = require('body-parser');;
 const dbConfig = require('./config/db');
 const cors = require('cors');
 const http = require('http');
-const socketIo = require('socket.io');
+const { Server } = require('socket.io');
+const Room = require('./models/Room');
+const User = require('./models/User');
 const authRoute = require('./routes/authRoutes');
 const roomRoutes = require('./routes/roomRoutes');
 
 
 const app = express();
+// Allow all origins during development, replace with specific origin in production
+app.use(cors());
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = new Server(server, {
+  cors: {
+    origin: `${process.env.FRONTEND || 'http://localhost:3000'}`,
+    methods: ["GET", "POST", "PATCH", "DELETE"]
+  }
+});
 const PORT = process.env.PORT || 3001;
 
 
 app.set('io', io);
 io.on('connection', (socket) => {
-  // Emit event when a participant joins the room
-socket.on('participantJoined', (roomId, participant) => {
-  io.to(roomId).emit('participantJoined', participant);
+
+  console.log("Connection established.");
+
+  // Handle participant joining
+  socket.on('participantJoined', async (roomId, participantName) => {
+    try {
+      // Find the room by ID
+      const room = await Room.findById(roomId);
+      if (!room) {
+        console.error('Room not found');
+        return;
+      }
+
+      // Add the participant to the room
+      room.participants.push({ name: participantName });
+      // Update the number of participants
+      room.save();
+
+      // Emit event to notify clients about the updated participant count
+      socket.emit('participantJoined', participantName, roomId);
+    } catch (error) {
+      console.error('Error adding participant:', error);
+    }
+  });
+
+  // Handle participant leaving
+  socket.on('disconnect', async () => {
+    try {
+      const roomId = socket.roomId;
+      if (!roomId) {
+        console.error('Room ID not found in socket.');
+        return;
+      }
+
+      // Find the room by ID
+      const room = await Room.findById(roomId);
+      if (!room) {
+        console.error('Room not found');
+        return;
+      }
+
+      // Get the socket ID of the disconnected participant
+      const disconnectedSocketId = socket.id;
+      // Find the index of the participant in the room's participants array using the socket ID
+      const participantIndex = room.participants.findIndex(participant => participant.socketId === disconnectedSocketId);
+      if (participantIndex !== -1) {
+        // Remove the participant from the room's participants array
+        room.participants.splice(participantIndex, 1);
+        // Update the database
+        await room.save();
+
+        // Emit event to notify clients about the updated participant count
+        io.to(roomId).emit('participantLeft', room.participants.length);
+      }
+    } catch (error) {
+      console.error('Error removing participant:', error);
+    }
+  });
+
 });
-
-// Emit event when the event starts
-socket.on('eventStart', (roomId) => {
-  io.to(roomId).emit('eventStart');
-});
-
-// Emit event when the event ends
-socket.on('eventEnd', (roomId) => {
-  io.to(roomId).emit('eventEnd');
-});
-
-// Emit event when winner is announced
-socket.on('winnerAnnounced', (roomId, winner) => {
-  io.to(roomId).emit('winnerAnnounced', winner);
-});
-
-});
-
-
-// Allow all origins during development, replace with specific origin in production
-app.use(cors());
 
 mongoose.connect(dbConfig.url, dbConfig.options)
   .then(() => {
@@ -63,6 +107,6 @@ app.get('/', (req, res) => {
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/events", roomRoutes);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

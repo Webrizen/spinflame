@@ -14,7 +14,7 @@ export default async function page({ params }) {
   const data = await getData(params.id)
   return (
     <section className='container mx-auto p-4'>
-      <SpinWheelArea data={data} />
+      <SpinWheelArea data={data} eventId={params.id} />
     </section>
   )
 }
