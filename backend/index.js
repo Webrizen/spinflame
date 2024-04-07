@@ -46,7 +46,7 @@ io.on('connection', (socket) => {
       room.save();
 
       // Emit event to notify clients about the updated participant count
-      socket.emit('participantJoined', participantName, roomId);
+      io.emit('participantJoined', participantName, roomId);
     } catch (error) {
       console.error('Error adding participant:', error);
     }

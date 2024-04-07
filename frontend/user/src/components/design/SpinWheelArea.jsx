@@ -158,7 +158,7 @@ const SpinWheelArea = ({ data, eventId }) => {
           ))}
         </div>
         <div className='w-full h-full flex justify-center items-center md:overflow-visible overflow-auto'>
-          {segments.length > 0 ? (
+          {segments.length > 1 ? (
             <SpinWheel segments={segments} {...spinWheelProps} />
           ) : (
             <>Loading...</>
