@@ -16,10 +16,11 @@ const app = express();
 // Allow all origins during development, replace with specific origin in production
 app.use(cors());
 const server = http.createServer(app);
+const frontendOrigin = process.env.FRONTEND || 'http://localhost:3000';
 const io = new Server(server, {
   cors: {
-    origin: `${process.env.FRONTEND || 'http://localhost:3000'}`,
-    methods: ["GET", "POST", "PATCH", "DELETE"]
+    origin: frontendOrigin,
+  methods: ["GET", "POST", "PATCH", "DELETE"]
   }
 });
 const PORT = process.env.PORT || 3001;
@@ -39,12 +40,16 @@ io.on('connection', (socket) => {
         console.error('Room not found');
         return;
       }
-
+  
       // Add the participant to the room
-      room.participants.push({ name: participantName });
+      const participant = { name: participantName, socketId: socket.id };
+      room.participants.push(participant);
       // Update the number of participants
-      room.save();
-
+      await room.save();
+  
+      // Set the roomId property for the socket
+      socket.roomId = roomId;
+  
       // Emit event to notify clients about the updated participant count
       io.emit('participantJoined', participantName, roomId);
     } catch (error) {

@@ -89,7 +89,7 @@ export default function Events() {
                 <div className='grid md:grid-cols-4 grid-cols-1 gap-4 my-4'>
                     {loading ? (
                         [...Array(7)].map((item, index) => (
-                            <div className='w-full flex flex-col gap-2'>
+                            <div className='w-full flex flex-col gap-2' key={index}>
                                 <div className='h-[150px] w-full dark:bg-slate-500 bg-slate-200 animate-pulse rounded-xl'></div>
                                 <div className='h-4 w-full dark:bg-slate-500 bg-slate-200 animate-pulse rounded-md'></div>
                                 <div className='h-2 w-full dark:bg-slate-500 bg-slate-200 animate-pulse rounded-md'></div>
