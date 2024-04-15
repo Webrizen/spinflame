@@ -91,6 +91,23 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('message', (message) => {
+    if (message === 'startSelection') {
+      // Notify clients that winner selection process has started
+      wss.clients.forEach((client) => {
+        client.send('Winner selection process has started');
+      });
+
+      // Simulate selection process (delayed response)
+      setTimeout(() => {
+        // Simulate selection completion
+        wss.clients.forEach((client) => {
+          client.send('Winner selected');
+        });
+      }, 5000); // Adjust delay as needed
+    }
+  });
+
 });
 
 mongoose.connect(dbConfig.url, dbConfig.options)
@@ -111,6 +128,13 @@ app.get('/', (req, res) => {
 
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/events", roomRoutes);
+// Route to select a lucky winner
+app.get("/api/v1/selectWinner", (req, res) => {
+  const participants = req.query.participants.split(',');
+  const winnerIndex = Math.floor(Math.random() * participants.length);
+  const winner = participants[winnerIndex];
+  res.json({ winner });
+});
 
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
