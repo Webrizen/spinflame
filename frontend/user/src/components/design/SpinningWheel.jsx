@@ -57,8 +57,11 @@ const SpinningWheel = ({
             document.getElementById("wheel").appendChild(canvas);
         }
         // Disable click event if not the creator
-        if (!isCreator) return;
-        canvas.addEventListener("click", spin, false);
+        if (!isCreator){
+            return null;
+        } else{
+            canvas.addEventListener("click", spin, false);
+        }
         canvasContext = canvas.getContext("2d"); // Initialize canvasContext
     };
     const audio = new Audio('/spin-sound.mp3');
