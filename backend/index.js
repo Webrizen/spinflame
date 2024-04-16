@@ -11,7 +11,6 @@ const User = require('./models/User');
 const authRoute = require('./routes/authRoutes');
 const roomRoutes = require('./routes/roomRoutes');
 
-
 const app = express();
 // Allow all origins during development, replace with specific origin in production
 app.use(cors());
@@ -20,15 +19,14 @@ const frontendOrigin = process.env.FRONTEND || 'http://localhost:3000';
 const io = new Server(server, {
   cors: {
     origin: frontendOrigin,
-  methods: ["GET", "POST", "PATCH", "DELETE"]
+    methods: ["GET", "POST", "PATCH", "DELETE"]
   }
 });
 const PORT = process.env.PORT || 3001;
 
-
 app.set('io', io);
-io.on('connection', (socket) => {
 
+io.on('connection', (socket) => {
   console.log("Connection established.");
 
   // Handle participant joining
@@ -91,20 +89,33 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('message', (message) => {
-    if (message === 'startSelection') {
+  // Handle start of winner selection process
+  socket.on('startSelection', async (roomId) => {
+    try {
       // Notify clients that winner selection process has started
-      wss.clients.forEach((client) => {
-        client.send('Winner selection process has started');
-      });
+      io.emit('startSelection');
 
       // Simulate selection process (delayed response)
-      setTimeout(() => {
-        // Simulate selection completion
-        wss.clients.forEach((client) => {
-          client.send('Winner selected');
-        });
+      setTimeout(async () => {
+        // Find the room by ID
+        const room = await Room.findById(roomId);
+        if (!room) {
+          console.error('Room not found');
+          return;
+        }
+
+        // Get participants' names
+        const participants = room.participants.map(participant => participant.name);
+
+        // Select a random winner
+        const winnerIndex = Math.floor(Math.random() * participants.length);
+        const winner = participants[winnerIndex];
+
+        // Emit event to notify clients about the winner
+        io.emit('winnerSelected', winner);
       }, 5000); // Adjust delay as needed
+    } catch (error) {
+      console.error('Error during winner selection process:', error);
     }
   });
 
@@ -128,13 +139,6 @@ app.get('/', (req, res) => {
 
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/events", roomRoutes);
-// Route to select a lucky winner
-app.get("/api/v1/selectWinner", (req, res) => {
-  const participants = req.query.participants.split(',');
-  const winnerIndex = Math.floor(Math.random() * participants.length);
-  const winner = participants[winnerIndex];
-  res.json({ winner });
-});
 
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

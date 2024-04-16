@@ -17,6 +17,7 @@ import { Input } from '../ui/input';
 import { useUserContext } from '@/context/UserContext';
 import { Button } from '../ui/button';
 import axios from "axios";
+import SpinningWheel from './SpinningWheel';
 
 const socket = io.connect(`${process.env.NEXT_PUBLIC_BASEURL_SOCKET}`);
 
@@ -62,7 +63,8 @@ const SpinWheelArea = ({ data, eventId }) => {
   const isCreator = user?.role === "creator";
   const [participants, setParticipants] = useState([]);
   const [segments, setSegments] = useState([]);
-  console.log(segments);
+  const [winner, setWinner] = useState('');
+  const [selectionStarted, setSelectionStarted] = useState(false);
 
   const handleSpinFinish = (result) => {
     console.log(`Spun to: ${result}`);
@@ -91,9 +93,22 @@ const SpinWheelArea = ({ data, eventId }) => {
       );
     });
 
+    // Listen for winner selection process start
+    socket.on('startSelection', () => {
+      setSelectionStarted(true);
+    });
+
+    // Listen for winner selected
+    socket.on('winnerSelected', (winner) => {
+      setWinner(winner);
+      setSelectionStarted(false);
+    });
+
     return () => {
       socket.off('participantJoined');
       socket.off('participantLeft');
+      socket.off('startSelection');
+      socket.off('winnerSelected');
     };
   }, [eventId]);
 
@@ -114,73 +129,77 @@ const SpinWheelArea = ({ data, eventId }) => {
     handleParticipantJoin(participantName);
   };
 
-  const spinWheelProps = {
-    onFinished: handleSpinFinish,
-    primaryColor: 'black',
-    contrastColor: 'white',
-    buttonText: 'Start',
-    isOnlyOnce: true,
-    size: 300,
-    upDuration: 50,
-    downDuration: 600,
-    fontFamily: 'Arial',
-    arrowLocation: 'top',
-    showTextOnSpin: true,
-    isSpinSound: true,
+  const handleStartSelection = () => {
+    socket.emit('startSelection', roomId);
   };
 
-  return (
-    <section className='w-full min-h-screen flex flex-col md:mt-0 mt-16'>
-      {isCreator ? null : (
-        <AlertDialog defaultOpen={true}>
-          <AlertDialogContent>
-            <form onSubmit={handleFormSubmit}>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Join Event {data?.name}.</AlertDialogTitle>
-                <AlertDialogDescription>
-                  <Input type="text" name="name" placeholder="Enter your name" className="w-full" />
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter className="mt-2">
-                <AlertDialogAction><Button type="submit" className="w-auto">Join Event</Button></AlertDialogAction>
-              </AlertDialogFooter>
-            </form>
-          </AlertDialogContent>
-        </AlertDialog>
-      )}
-      <div className='p-2 md:grid md:grid-cols-[.4fr_1fr_.4fr] md:h-[50vh] flex flex-col justify-center items-center gap-2'>
-        <div className='w-full h-full px-3 py-4 dark:bg-[rgba(225,225,225,0.1)] relative bg-[rgba(0,0,0,0.05)] rounded-xl flex md:flex-col flex-row md:items-start items-center justify-start gap-2 md:overflow-y-auto overflow-x-auto'>
-          <div className='w-full dark:bg-[rgba(225,225,225,0.1)] bg-[rgba(0,0,0,0.1)] border dark:border-[rgba(225,225,225,0.1)] border-[rgba(0,0,0,0.1)] py-2 px-3 rounded-lg sticky top-2 backdrop-blur-3xl md:whitespace-normal whitespace-nowrap'>Live 🔴</div>
-          {participants.map((participant, index) => (
-            <Audience key={index} name={participant} />
-          ))}
-        </div>
-        <div className={`${isCreator ? 'cursor-pointer' : 'cursor-not-allowed pointer-events-none'} w-full h-full flex justify-center items-center md:overflow-visible overflow-auto`}>
-          {segments.length > 0 ? (
-            <SpinWheel key={segments.length} segments={segments} {...spinWheelProps} />
-          ) : (
-            <div>Loading...</div>
-          )}
-        </div>
-        <div className='w-full h-full p-3 dark:bg-[rgba(225,225,225,0.1)] relative bg-[rgba(0,0,0,0.05)] rounded-xl flex flex-col gap-2'>
-          <div className='w-full dark:bg-[rgba(225,225,225,0.1)] bg-[rgba(0,0,0,0.1)] border dark:border-[rgba(225,225,225,0.1)] border-[rgba(0,0,0,0.1)] py-2 px-3 rounded-lg backdrop-blur-3xl'>Event & Creator Info</div>
-          <div className='w-full flex flex-col gap-2 px-2'>
-            <h1 className='text-xl font-semibold'>{data?.name}</h1>
-            <div className='w-full flex flex-row gap-2 items-center text-xs whitespace-nowrap dark:text-slate-500'>
-              <span>{formatTimeAgo(data?.createdAt)}</span>
-              <span>•</span>
-              <span>{data?.maxParticipants} participants</span>
-            </div>
-            <p className='text-sm dark:text-slate-300 text-slate-500'>{data?.description}</p>
-          </div>
-          <EventCreator id={data?.creator} />
-          <div className='w-full h-full dark:bg-[rgba(225,225,225,0.1)] bg-[rgba(0,0,0,0.01)] border dark:border-[rgba(225,225,225,0.1)] border-[rgba(0,0,0,0.1)] rounded-lg backdrop-blur-3xl'>
-            <img src="https://placehold.co/600x400?text=Ad" alt='Creator' className='w-full h-full object-cover rounded-xl border dark:border-[rgba(225,225,225,0.1)] border-[rgba(0,0,0,0.1)]' />
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
+  const segColors = Array.from({ length: segments.length }, () => `#${Math.floor(Math.random()*16777215).toString(16)}`);
 
-export default SpinWheelArea;
+    return (
+      <section className='w-full min-h-screen flex flex-col md:mt-0 mt-16'>
+        {isCreator ? null : (
+          <AlertDialog defaultOpen={true}>
+            <AlertDialogContent>
+              <form onSubmit={handleFormSubmit}>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Join Event {data?.name}.</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    <Input type="text" name="name" placeholder="Enter your name" className="w-full" />
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter className="mt-2">
+                  <AlertDialogAction><Button type="submit" className="w-auto">Join Event</Button></AlertDialogAction>
+                </AlertDialogFooter>
+              </form>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
+        <div className='p-2 md:grid md:grid-cols-[.4fr_1fr_.4fr] md:h-[50vh] flex flex-col justify-center items-center gap-2'>
+          <div className='w-full h-full px-3 py-4 dark:bg-[rgba(225,225,225,0.1)] relative bg-[rgba(0,0,0,0.05)] rounded-xl flex md:flex-col flex-row md:items-start items-center justify-start gap-2 md:overflow-y-auto overflow-x-auto'>
+            <div className='w-full dark:bg-[rgba(225,225,225,0.1)] bg-[rgba(0,0,0,0.1)] border dark:border-[rgba(225,225,225,0.1)] border-[rgba(0,0,0,0.1)] py-2 px-3 rounded-lg sticky top-2 backdrop-blur-3xl md:whitespace-normal whitespace-nowrap'>Live 🔴</div>
+            {participants.map((participant, index) => (
+              <Audience key={index} name={participant} />
+            ))}
+          </div>
+          <div className={`${isCreator ? 'cursor-pointer' : 'cursor-not-allowed pointer-events-none'} w-full h-full flex justify-center items-center md:overflow-visible overflow-auto`}>
+            {segments.length > 0 ? (
+              <SpinningWheel
+                segments={participants}
+                segColors={segColors}
+                winningSegment=""
+                onFinished={(winner) => handleSpinFinish(winner)}
+                primaryColor="black"
+                primaryColoraround="#ffffffb4"
+                contrastColor="white"
+                buttonText="Spin"
+                isOnlyOnce={false}
+                size={190}
+                upDuration={50}
+                downDuration={2000}
+              />
+            ) : (
+              <div>Loading...</div>
+            )}
+          </div>
+          <div className='w-full h-full p-3 dark:bg-[rgba(225,225,225,0.1)] relative bg-[rgba(0,0,0,0.05)] rounded-xl flex flex-col gap-2'>
+            <div className='w-full dark:bg-[rgba(225,225,225,0.1)] bg-[rgba(0,0,0,0.1)] border dark:border-[rgba(225,225,225,0.1)] border-[rgba(0,0,0,0.1)] py-2 px-3 rounded-lg backdrop-blur-3xl'>Event & Creator Info</div>
+            <div className='w-full flex flex-col gap-2 px-2'>
+              <h1 className='text-xl font-semibold'>{data?.name}</h1>
+              <div className='w-full flex flex-row gap-2 items-center text-xs whitespace-nowrap dark:text-slate-500'>
+                <span>{formatTimeAgo(data?.createdAt)}</span>
+                <span>•</span>
+                <span>{data?.maxParticipants} participants</span>
+              </div>
+              <p className='text-sm dark:text-slate-300 text-slate-500'>{data?.description}</p>
+            </div>
+            <EventCreator id={data?.creator} />
+            <div className='w-full h-full dark:bg-[rgba(225,225,225,0.1)] bg-[rgba(0,0,0,0.01)] border dark:border-[rgba(225,225,225,0.1)] border-[rgba(0,0,0,0.1)] rounded-lg backdrop-blur-3xl'>
+              <img src="https://placehold.co/600x400?text=Ad" alt='Creator' className='w-full h-full object-cover rounded-xl border dark:border-[rgba(225,225,225,0.1)] border-[rgba(0,0,0,0.1)]' />
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  };
+
+  export default SpinWheelArea;
