@@ -47,22 +47,11 @@ function formatTimeAgo(timestamp) {
   }
 }
 
-// Generate random colors for the segments
-const getRandomColor = () => {
-  const letters = '0123456789ABCDEF';
-  let color = '#';
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-};
-
 const SpinWheelArea = ({ data, eventId }) => {
   const roomId = eventId;
   const { user } = useUserContext();
   const isCreator = user?.role === "creator";
   const [participants, setParticipants] = useState([]);
-  const [segments, setSegments] = useState([]);
   const [winner, setWinner] = useState('');
   const [selectionStarted, setSelectionStarted] = useState(false);
 
@@ -112,13 +101,6 @@ const SpinWheelArea = ({ data, eventId }) => {
     };
   }, [eventId]);
 
-  useEffect(() => {
-    setSegments(participants.map((participant, index) => ({
-      segmentText: participant,
-      segColor: getRandomColor()
-    })));
-  }, [participants]);
-
   const handleParticipantJoin = (name) => {
     socket.emit('participantJoined', roomId, name);
   };
@@ -133,7 +115,7 @@ const SpinWheelArea = ({ data, eventId }) => {
     socket.emit('startSelection', roomId);
   };
 
-  const segColors = Array.from({ length: segments.length }, () => `#${Math.floor(Math.random()*16777215).toString(16)}`);
+  const segColors = Array.from({ length: participants.length }, () => `#${Math.floor(Math.random()*16777215).toString(16)}`);
 
     return (
       <section className='w-full min-h-screen flex flex-col md:mt-0 mt-16'>
@@ -144,7 +126,7 @@ const SpinWheelArea = ({ data, eventId }) => {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Join Event {data?.name}.</AlertDialogTitle>
                   <AlertDialogDescription>
-                    <Input type="text" name="name" placeholder="Enter your name" className="w-full" />
+                    <Input type="text" name="name" placeholder="Enter your name" className="w-full" required />
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter className="mt-2">
@@ -162,7 +144,7 @@ const SpinWheelArea = ({ data, eventId }) => {
             ))}
           </div>
           <div className={`${isCreator ? 'cursor-pointer' : 'cursor-not-allowed pointer-events-none'} w-full h-full flex justify-center items-center md:overflow-visible overflow-auto`}>
-            {segments.length > 0 ? (
+            {participants.length > 0 ? (
               <SpinningWheel
                 segments={participants}
                 segColors={segColors}
