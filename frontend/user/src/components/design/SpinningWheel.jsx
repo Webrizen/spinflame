@@ -235,7 +235,7 @@ const SpinningWheel = ({
                 width="600"
                 height="600"
                 style={{
-                    pointerEvents: isFinished && isOnlyOnce ? "none" : "auto"
+                    pointerEvents: (isFinished && isOnlyOnce) || !isCreator ? "none" : "auto"
                 }}
             />
         </div>
