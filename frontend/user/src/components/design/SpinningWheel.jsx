@@ -18,7 +18,8 @@ const SpinningWheel = ({
     downDuration = 100,
     fontFamily = "proxima-nova",
     width = 100,
-    height = 100
+    height = 100,
+    isCreator 
 }) => {
     let currentSegment = "";
     let isStarted = false;
@@ -55,6 +56,7 @@ const SpinningWheel = ({
         canvas.setAttribute("id", "canvas");
         document.getElementById("wheel").appendChild(canvas);
       }
+      if (!isCreator) return;
       canvas.addEventListener("click", spin, false);
       canvasContext = canvas.getContext("2d");
     };

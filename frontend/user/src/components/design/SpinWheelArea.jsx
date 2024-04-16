@@ -172,13 +172,14 @@ const SpinWheelArea = ({ data, eventId }) => {
                 primaryColoraround="#ffffffb4"
                 contrastColor="white"
                 buttonText="Spin"
-                isOnlyOnce={false}
+                isOnlyOnce={true}
                 size={190}
                 upDuration={50}
                 downDuration={2000}
+                isCreator={isCreator}
               />
             ) : (
-              <div>Loading...</div>
+              <div>Please Wait...</div>
             )}
           </div>
           <div className='w-full h-full p-3 dark:bg-[rgba(225,225,225,0.1)] relative bg-[rgba(0,0,0,0.05)] rounded-xl flex flex-col gap-2'>
