@@ -19,7 +19,7 @@ const SpinningWheel = ({
     fontFamily = "proxima-nova",
     width = 100,
     height = 100,
-    isCreator 
+    isCreator
 }) => {
     let currentSegment = "";
     let isStarted = false;
@@ -37,43 +37,44 @@ const SpinningWheel = ({
     const centerX = 300;
     const centerY = 300;
     useEffect(() => {
-      wheelInit();
-      setTimeout(() => {
-        window.scrollTo(0, 1);
-      }, 0);
+        wheelInit();
+        setTimeout(() => {
+            window.scrollTo(0, 1);
+        }, 0);
     }, []);
     const wheelInit = () => {
-      initCanvas();
-      wheelDraw();
+        initCanvas();
+        wheelDraw();
     };
 
     const initCanvas = () => {
-      let canvas = document.getElementById("canvas");
-      if (navigator.appVersion.indexOf("MSIE") !== -1) {
-        canvas = document.createElement("canvas");
-        canvas.setAttribute("width", width);
-        canvas.setAttribute("height", height);
-        canvas.setAttribute("id", "canvas");
-        document.getElementById("wheel").appendChild(canvas);
-      }
-      if (!isCreator) return;
-      canvas.addEventListener("click", spin, false);
-      canvasContext = canvas.getContext("2d");
+        let canvas = document.getElementById("canvas");
+        if (navigator.appVersion.indexOf("MSIE") !== -1) {
+            canvas = document.createElement("canvas");
+            canvas.setAttribute("width", width);
+            canvas.setAttribute("height", height);
+            canvas.setAttribute("id", "canvas");
+            document.getElementById("wheel").appendChild(canvas);
+        }
+        // Disable click event if not the creator
+        if (!isCreator) return;
+        canvas.addEventListener("click", spin, false);
+        canvasContext = canvas.getContext("2d"); // Initialize canvasContext
     };
     const audio = new Audio('/spin-sound.mp3');
-    
+
     const spin = () => {
-      isStarted = true;
-      // onRotate();
-      if (timerHandle === 0) {
-        audio.loop = true;
-        audio.play();
-        spinStart = new Date().getTime();
-        // maxSpeed = Math.PI / ((segments.length*2) + Math.random())
-        maxSpeed = Math.PI / segments.length;
-        frames = 0;
-        timerHandle = setInterval(onTimerTick, timerDelay);
-      }
+        isStarted = true;
+        // onRotate();
+        if (timerHandle === 0) {
+            audio.loop = true;
+            audio.play();
+            spinStart = new Date().getTime();
+            // maxSpeed = Math.PI / ((segments.length*2) + Math.random())
+            maxSpeed = Math.PI / segments.length;
+            frames = 0;
+            timerHandle = setInterval(onTimerTick, timerDelay);
+        }
     };
 
     const onTimerTick = () => {
