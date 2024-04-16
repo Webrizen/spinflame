@@ -58,7 +58,7 @@ const SpinningWheel = ({
         }
         // Disable click event if not the creator
         if (!isCreator){
-            return null;
+            canvas.addEventListener("click", false);
         } else{
             canvas.addEventListener("click", spin, false);
         }
