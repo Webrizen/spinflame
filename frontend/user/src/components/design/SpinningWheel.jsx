@@ -56,14 +56,15 @@ const SpinningWheel = ({
             canvas.setAttribute("id", "canvas");
             document.getElementById("wheel").appendChild(canvas);
         }
-        // Disable click event if not the creator
-        if (!isCreator){
-            canvas.addEventListener("click", false);
-        } else{
+        canvas.addEventListener("click", spin, false);
+        canvasContext = canvas.getContext("2d");
+        if (!isCreator) {
+            canvas.style.pointerEvents = "none";
+          } else {
             canvas.addEventListener("click", spin, false);
-        }
-        canvasContext = canvas.getContext("2d"); // Initialize canvasContext
+          }
     };
+
     const audio = new Audio('/spin-sound.mp3');
 
     const spin = () => {
@@ -228,7 +229,6 @@ const SpinningWheel = ({
 
     };
     const clear = () => {
-        if (!canvasContext) return;
         const ctx = canvasContext;
         ctx.clearRect(0, 0, 1000, 800);
     };
