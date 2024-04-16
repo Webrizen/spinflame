@@ -225,6 +225,7 @@ const SpinningWheel = ({
 
     };
     const clear = () => {
+        if (!canvasContext) return;
         const ctx = canvasContext;
         ctx.clearRect(0, 0, 1000, 800);
     };
