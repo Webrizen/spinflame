@@ -197,7 +197,7 @@ const SpinningWheel = ({
         ctx.beginPath();
         ctx.arc(centerX, centerY, size, 0, PI2, false);
         ctx.closePath();
-        ctx.lineWidth = 25;
+        ctx.lineWidth = 5;
         ctx.strokeStyle = primaryColoraround || "white";
         ctx.stroke();
     };

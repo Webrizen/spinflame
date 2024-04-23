@@ -38,16 +38,16 @@ io.on('connection', (socket) => {
         console.error('Room not found');
         return;
       }
-  
+
       // Add the participant to the room
       const participant = { name: participantName, socketId: socket.id };
       room.participants.push(participant);
       // Update the number of participants
       await room.save();
-  
+
       // Set the roomId property for the socket
       socket.roomId = roomId;
-  
+
       // Emit event to notify clients about the updated participant count
       io.emit('participantJoined', participantName, roomId);
     } catch (error) {
@@ -89,35 +89,26 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Handle start of winner selection process
-  socket.on('startSelection', async (roomId) => {
+  // Handle startSpinWheel event from creator
+  socket.on('startSpinWheel', (roomId) => {
     try {
-      // Notify clients that winner selection process has started
-      io.emit('startSelection');
-
-      // Simulate selection process (delayed response)
-      setTimeout(async () => {
-        // Find the room by ID
-        const room = await Room.findById(roomId);
-        if (!room) {
-          console.error('Room not found');
-          return;
-        }
-
-        // Get participants' names
-        const participants = room.participants.map(participant => participant.name);
-
-        // Select a random winner
-        const winnerIndex = Math.floor(Math.random() * participants.length);
-        const winner = participants[winnerIndex];
-
-        // Emit event to notify clients about the winner
-        io.emit('winnerSelected', winner);
-      }, 5000); // Adjust delay as needed
+      // Emit startSpinWheel event to all clients except the creator
+      socket.broadcast.to(roomId).emit('startSpinWheel');
     } catch (error) {
-      console.error('Error during winner selection process:', error);
+      console.error('Error handling startSpinWheel event:', error);
     }
   });
+
+  // Handle stopSpinWheel event from creator
+  socket.on('stopSpinWheel', (roomId, winner) => {
+    try {
+      // Emit stopSpinWheel event to all clients except the creator
+      socket.broadcast.to(roomId).emit('stopSpinWheel', winner);
+    } catch (error) {
+      console.error('Error handling stopSpinWheel event:', error);
+    }
+  });
+
 
 });
 
