@@ -47,7 +47,7 @@ io.on('connection', (socket) => {
 
       // Set the roomId property for the socket
       socket.roomId = roomId;
-
+      socket.join(roomId)
       // Emit event to notify clients about the updated participant count
       io.emit('participantJoined', participantName, roomId);
     } catch (error) {
