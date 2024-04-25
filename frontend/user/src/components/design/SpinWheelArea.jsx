@@ -60,8 +60,8 @@ const SpinWheelArea = ({ data, eventId }) => {
   const handleSpinFinish = (result) => {
     console.log(`Spun to: ${result}`);
     setWinner(result);
-    socket.on('stopSpinWheel', roomId, winner);
-    alert(`${winner}`);
+    socket.emit('stopSpinWheel', roomId, result);
+    //alert(`${result}`);
   };
 
   useEffect(() => {
@@ -91,11 +91,11 @@ const SpinWheelArea = ({ data, eventId }) => {
       console.log("spin is true");
     });
 
-    socket.on('stopSpinWheel', (roomId, winner) => {
+    socket.on('stopSpinWheel', (winner) => {
       setSpinover(true);
       setSpinning(false);
       setWinner(winner);
-      console.log(`stoped the wheel ${winner}`)
+      console.log(winner,`stoped the wheel ${winner}`)
     });
 
     return () => {
@@ -125,7 +125,7 @@ const SpinWheelArea = ({ data, eventId }) => {
 
   return (
     <section className='w-full min-h-screen flex flex-col md:mt-0 mt-16'>
-      {/* {isCreator ? null : (
+      {isCreator ? null : (
         <AlertDialog defaultOpen={true}>
           <AlertDialogContent>
             <form onSubmit={handleFormSubmit}>
@@ -141,7 +141,7 @@ const SpinWheelArea = ({ data, eventId }) => {
             </form>
           </AlertDialogContent>
         </AlertDialog>
-      )} */}
+      )}
       <div className='p-2 md:grid md:grid-cols-[.4fr_1fr_.4fr] md:h-[50vh] flex flex-col justify-center items-center gap-2'>
         <div className='w-full h-full px-3 py-4 dark:bg-[rgba(225,225,225,0.1)] relative bg-[rgba(0,0,0,0.05)] rounded-xl flex md:flex-col flex-row md:items-start items-center justify-start gap-2 md:overflow-y-auto overflow-x-auto'>
           <div className='w-full dark:bg-[rgba(225,225,225,0.1)] bg-[rgba(0,0,0,0.1)] border dark:border-[rgba(225,225,225,0.1)] border-[rgba(0,0,0,0.1)] py-2 px-3 rounded-lg sticky top-2 backdrop-blur-3xl md:whitespace-normal whitespace-nowrap'>Live 🔴</div>
