@@ -100,10 +100,11 @@ io.on('connection', (socket) => {
   });
 
   // Handle stopSpinWheel event from creator
-  socket.on('stopSpinWheel', (roomId, winner) => {
+  socket.on('stopSpinWheel', async (roomId, winner) => {
     try {
       // Emit stopSpinWheel event to all clients except the creator
       socket.broadcast.to(roomId).emit('stopSpinWheel', winner);
+      await Room.findByIdAndUpdate(roomId, { winner: { name: winner } });
     } catch (error) {
       console.error('Error handling stopSpinWheel event:', error);
     }
