@@ -36,11 +36,15 @@ const NonCreatorSpinningWheel = ({
 
   useEffect(() => {
     if (spinning) {
+      wheelInit();
+      setTimeout(() => {
+        window.scrollTo(0, 1);
+      }, 0);
       spin();
-    } else if (spinover) {
+    } else if (spinover && winner) {
       stopSpin();
     }
-  }, [spinning, spinover]);
+  }, [spinning, spinover, winner]);
 
   useEffect(() => {
     wheelInit();
