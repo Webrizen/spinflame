@@ -19,6 +19,7 @@ import { Button } from '../ui/button';
 import axios from "axios";
 import SpinningWheel from './SpinningWheel';
 import NonCreatorSpinningWheel from './NonCreatorSpinningWheel';
+import SpringModal from '../ui/SpringModal';
 
 const socket = io.connect(`${process.env.NEXT_PUBLIC_BASEURL_SOCKET}`);
 
@@ -56,12 +57,12 @@ const SpinWheelArea = ({ data, eventId }) => {
   const [winner, setWinner] = useState('');
   const [spinning, setSpinning] = useState(false);
   const [spinover, setSpinover] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleSpinFinish = (result) => {
     console.log(`Spun to: ${result}`);
     setWinner(result);
     socket.emit('stopSpinWheel', roomId, result);
-    //alert(`${result}`);
   };
 
   useEffect(() => {
@@ -88,14 +89,13 @@ const SpinWheelArea = ({ data, eventId }) => {
 
     socket.on('startSpinWheel', (roomId) => {
       setSpinning(true);
-      console.log("spin is true");
     });
 
     socket.on('stopSpinWheel', (winner) => {
       setSpinover(true);
       setSpinning(false);
       setWinner(winner);
-      console.log(winner,`stoped the wheel ${winner}`)
+      setIsOpen(true);
     });
 
     return () => {
@@ -118,7 +118,6 @@ const SpinWheelArea = ({ data, eventId }) => {
 
   const handleStartSelection = () => {
     socket.emit('startSpinWheel', roomId);
-    console.log("started the wheel")
   };
 
   const segColors = Array.from({ length: participants.length }, () => `#${Math.floor(Math.random() * 16777215).toString(16)}`);
@@ -149,6 +148,7 @@ const SpinWheelArea = ({ data, eventId }) => {
             <Audience key={index} name={participant} />
           ))}
         </div>
+        <SpringModal isOpen={isOpen} setIsOpen={setIsOpen} winner={winner} />
         <div className={`${isCreator ? 'cursor-pointer' : 'cursor-not-allowed pointer-events-none'} w-full h-full flex justify-center items-center md:overflow-visible overflow-auto`} onClick={handleStartSelection}>
           {participants.length > 0 ? (
             isCreator ? (
