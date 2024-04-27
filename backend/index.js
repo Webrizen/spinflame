@@ -90,10 +90,11 @@ io.on('connection', (socket) => {
   });
 
   // Handle startSpinWheel event from creator
-  socket.on('startSpinWheel', (roomId) => {
+  socket.on('startSpinWheel', async (roomId) => {
     try {
       // Emit startSpinWheel event to all clients except the creator
       socket.broadcast.to(roomId).emit('startSpinWheel');
+      await Room.findByIdAndUpdate(roomId, { status: 'started' });
     } catch (error) {
       console.error('Error handling startSpinWheel event:', error);
     }
@@ -104,7 +105,7 @@ io.on('connection', (socket) => {
     try {
       // Emit stopSpinWheel event to all clients except the creator
       socket.broadcast.to(roomId).emit('stopSpinWheel', winner);
-      await Room.findByIdAndUpdate(roomId, { winner: { name: winner } });
+      await Room.findByIdAndUpdate(roomId, { status: 'finished', winner: { name: winner } });
     } catch (error) {
       console.error('Error handling stopSpinWheel event:', error);
     }

@@ -1,59 +1,32 @@
-"use client"
+"use client";
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
+export function Overview({ RoomData }) {
+  // Create an array to hold the number of rooms created in each month
+  const roomsByMonth = Array.from({ length: 12 }, () => 0);
 
-const data = [
-  {
-    name: "Jan",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Feb",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Mar",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Apr",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "May",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Jun",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Jul",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Aug",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Sep",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Oct",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Nov",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Dec",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-]
+  // Iterate through the RoomData and count the number of rooms created in each month
+  RoomData.forEach(room => {
+    const month = new Date(room.createdAt).getMonth();
+    roomsByMonth[month]++;
+  });
 
-export function Overview() {
+  // Prepare the data for the chart
+  const data = [
+    { name: "Jan", total: roomsByMonth[0] },
+    { name: "Feb", total: roomsByMonth[1] },
+    { name: "Mar", total: roomsByMonth[2] },
+    { name: "Apr", total: roomsByMonth[3] },
+    { name: "May", total: roomsByMonth[4] },
+    { name: "Jun", total: roomsByMonth[5] },
+    { name: "Jul", total: roomsByMonth[6] },
+    { name: "Aug", total: roomsByMonth[7] },
+    { name: "Sep", total: roomsByMonth[8] },
+    { name: "Oct", total: roomsByMonth[9] },
+    { name: "Nov", total: roomsByMonth[10] },
+    { name: "Dec", total: roomsByMonth[11] },
+  ];
+
   return (
     <ResponsiveContainer width="100%" height={350}>
       <BarChart data={data}>
@@ -69,7 +42,7 @@ export function Overview() {
           fontSize={12}
           tickLine={false}
           axisLine={false}
-          tickFormatter={(value) => `$${value}`}
+          tickFormatter={(value) => `${value}`}
         />
         <Bar
           dataKey="total"
