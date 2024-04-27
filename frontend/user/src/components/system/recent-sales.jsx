@@ -1,5 +1,20 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
+
+// Function to get the color class based on status
+function getStatusColor(status) {
+  switch (status) {
+    case 'pending':
+      return 'bg-red-100 text-red-500';
+    case 'started':
+      return 'bg-blue-100 text-blue-500';
+    case 'finished':
+      return 'bg-green-100 text-green-700';
+    default:
+      return 'bg-slate-100 text-slate-500';
+  }
+}
+
 export function RecentSales({ data }) {
   return (
     <div className="space-y-8">
@@ -15,7 +30,7 @@ export function RecentSales({ data }) {
             </p>
             <p className="text-sm text-muted-foreground">{event?.name || "Event not started yet!"}</p>
           </div>
-          <div className="ml-auto font-medium">{event?.status || "N/A"}</div>
+          <div className={`ml-auto px-3 py-1 rounded-xl text-xs font-medium ${getStatusColor(event?.status)}`}>{event?.status || "N/A"}</div>
         </div>
       ))}
     </div>

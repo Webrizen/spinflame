@@ -175,7 +175,7 @@ export default function page() {
         <Card className="md:col-span-3">
           <CardHeader>
             <CardTitle>Recent Winners From Your Events</CardTitle>
-            <CardDescription>You made 265 winners this month.</CardDescription>
+            <CardDescription>congratulations to all the  winners who participated.</CardDescription>
           </CardHeader>
           <CardContent>
             <RecentSales data={rooms} />
