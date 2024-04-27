@@ -72,16 +72,18 @@ const SpinWheelArea = ({ data, eventId }) => {
     socket.emit("stopSpinWheel", roomId, result);
   };
 
+  console.log(data);
+
   useEffect(() => {
     const checkUserParticipation = async () => {
-      if (user && data && data.creator === user?._id) {
+      if (user && data && data.creator === user?.userId) {
         setIsUser(true);
-      } else{
+      } else {
         toast({
           variant: "destructive",
           title: `You're not the creator of this event!`,
           description: `Please Go back or else you'll get a 🍌 - just kidding, you can still join as a participant!`,
-      })
+        });
       }
     };
 
@@ -171,6 +173,30 @@ const SpinWheelArea = ({ data, eventId }) => {
     () => `#${Math.floor(Math.random() * 16777215).toString(16)}`
   );
 
+  const shareEvent = async () => {
+    try {
+      await navigator.share({
+        title: "Share Event",
+        text: `Check out this awesome event! - ${data?.name}`,
+        url: window.location.href,
+      });
+    } catch (error) {
+      console.error("Error sharing event:", error);
+    }
+  };
+
+  const copyUrl = () => {
+    const urlInput = document.createElement("input");
+    urlInput.setAttribute("value", window.location.href);
+    document.body.appendChild(urlInput);
+    urlInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(urlInput);
+    toast({
+      title: "URL copied to clipboard!",
+    });
+  };
+
   return (
     <>
       {eventData?.winner?.name ? (
@@ -235,7 +261,8 @@ const SpinWheelArea = ({ data, eventId }) => {
                       <TbGiftFilled />
                     </div>
                     <h3 className="text-3xl font-bold text-center mb-2">
-                      Congratulations! {eventData?.winner?.name || "No One"} was the winner! 🎉
+                      Congratulations! {eventData?.winner?.name || "No One"} was
+                      the winner! 🎉
                     </h3>
                     <p className="text-center mb-6">
                       Thank you to all participants for your enthusiasm and
@@ -250,9 +277,7 @@ const SpinWheelArea = ({ data, eventId }) => {
                       >
                         Nah, go back
                       </Link>
-                      <button
-                        className="bg-white hover:opacity-90 transition-opacity text-indigo-600 font-semibold w-full py-2 rounded"
-                      >
+                      <button className="bg-white hover:opacity-90 transition-opacity text-indigo-600 font-semibold w-full py-2 rounded">
                         Understood!
                       </button>
                     </div>
@@ -320,8 +345,40 @@ const SpinWheelArea = ({ data, eventId }) => {
           )}
           <div className="p-2 md:grid md:grid-cols-[.4fr_1fr_.4fr] md:h-[50vh] flex flex-col justify-center items-center gap-2">
             <div className="w-full h-full px-3 py-4 dark:bg-[rgba(225,225,225,0.1)] relative bg-[rgba(0,0,0,0.05)] rounded-xl flex md:flex-col flex-row md:items-start items-center justify-start gap-2 md:overflow-y-auto overflow-x-auto">
-              <div className="w-full dark:bg-[rgba(225,225,225,0.1)] bg-[rgba(0,0,0,0.1)] border dark:border-[rgba(225,225,225,0.1)] border-[rgba(0,0,0,0.1)] py-2 px-3 rounded-lg sticky top-2 backdrop-blur-3xl md:whitespace-normal whitespace-nowrap">
-                Live 🔴
+              <div className="w-full flex flex-row justify-between items-center dark:bg-[rgba(225,225,225,0.1)] bg-[rgba(0,0,0,0.1)] border dark:border-[rgba(225,225,225,0.1)] border-[rgba(0,0,0,0.1)] py-2 px-3 rounded-lg sticky top-2 backdrop-blur-3xl md:whitespace-normal whitespace-nowrap">
+                <span>Live 🔴</span>
+                <div className="text-xs flex flex-row items-center justify-end gap-2">
+                  <button
+                    onClick={shareEvent}
+                    class="relative inline-block px-4 py-2 font-medium group"
+                  >
+                    <span class="absolute inset-0 w-full h-full transition duration-200 ease-out transform translate-x-1 translate-y-1 bg-black group-hover:-translate-x-0 group-hover:-translate-y-0"></span>
+                    <span class="absolute inset-0 w-full h-full bg-white border-2 border-black group-hover:bg-black"></span>
+                    <span class="relative text-black group-hover:text-white">
+                      Share
+                    </span>
+                  </button>
+                  <span
+                    className="w-[35px] h-[35px] flex justify-center items-center cursor-pointer dark:hover:bg-[rgba(225,225,225,0.1)] hover:bg-[rgba(0,0,0,0.1)] rounded-2xl"
+                    title="Copy URL of the Event!"
+                    onClick={copyUrl}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-4 h-4"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"
+                      />
+                    </svg>
+                  </span>
+                </div>
               </div>
               {participants.map((participant, index) => (
                 <Audience key={index} name={participant} />
