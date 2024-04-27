@@ -51,7 +51,7 @@ const NonCreatorSpinningWheel = ({
     setTimeout(() => {
       window.scrollTo(0, 1);
     }, 0);
-  }, []);
+  }, [segments]);
 
   const wheelInit = () => {
     initCanvas();

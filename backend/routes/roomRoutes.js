@@ -101,9 +101,7 @@ router.delete('/rooms/:id', async (req, res) => {
     if (!deletedRoom) {
       return res.status(404).json({ message: 'Room not found' });
     }
-    // Emit Socket.io event when a room is deleted
-    io.emit('roomDeleted', id);
-    res.json({ message: 'Room deleted successfully' });
+    res.status(200).json({ message: 'Room deleted successfully' });
   } catch (error) {
     console.error('Error deleting room:', error);
     res.status(500).json({ message: 'Internal server error' });
