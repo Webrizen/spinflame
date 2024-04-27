@@ -13,8 +13,6 @@ export default function DashboardLayout({ children }) {
             <Link href="/dashboard/create-events" className="w-min whitespace-nowrap py-2 px-3 rounded text-sm dark:hover:bg-[rgba(225,225,225,0.06)] hover:bg-[rgba(0,0,0,0.06)]">Create Event</Link>
             <span>·</span>
             <Link href="/dashboard/manage-events" className="w-min whitespace-nowrap py-2 px-3 rounded text-sm dark:hover:bg-[rgba(225,225,225,0.06)] hover:bg-[rgba(0,0,0,0.06)]">Manage Events</Link>
-            <span>·</span>
-            <Link href="/dashboard/settings" className="w-min whitespace-nowrap py-2 px-3 rounded text-sm dark:hover:bg-[rgba(225,225,225,0.06)] hover:bg-[rgba(0,0,0,0.06)]">Settings</Link>
           </nav>
 
           <main className="md:p-2 p-0">{children}</main>

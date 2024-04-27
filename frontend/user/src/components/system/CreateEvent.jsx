@@ -8,6 +8,7 @@ import { useUserContext } from '@/context/UserContext';
 import DatePicker from '@/components/ui/DatePicker';
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
+import { useRouter } from 'next/navigation';
 
 export default function CreateEvent() {
     const { user } = useUserContext();
@@ -20,6 +21,7 @@ export default function CreateEvent() {
     const [startDate, setStartDate] = useState(null);
     const { toast } = useToast();
     const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
     const handleEventNameChange = (event) => {
         setEventName(event.target.value);
@@ -68,6 +70,7 @@ export default function CreateEvent() {
                 title: "Event Created successfully!",
                 description: `${response.data.message} - At ${new Date()}, our system detected a Login from your IP.`,
             })
+            router.push(`/events/${response.data._id}`);
         } catch (error) {
             // Handle error response
             console.error("Error creating event:", error);
@@ -78,6 +81,7 @@ export default function CreateEvent() {
             })
         } finally {
             setLoading(false);
+
         }
     };
 
