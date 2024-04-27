@@ -26,7 +26,7 @@ export default function Navbar() {
     return (
         <>
             <header
-                className="p-2 sticky top-2 w-full z-50" style={{ zIndex: "9999999" }}>
+                className="p-2 sticky top-2 w-full" style={{ zIndex: "9999999" }}>
                 <div className="container mx-auto flex flex-row flex-wrap p-3 md:justify-normal justify-between items-center bg-[rgba(225,225,225,0.1)] backdrop-blur-2xl rounded-xl border border-slate-300  dark:border-slate-700">
                     <Link
                         href="/"

@@ -19,9 +19,10 @@ import axios from "axios";
 import SpinningWheel from "./SpinningWheel";
 import NonCreatorSpinningWheel from "./NonCreatorSpinningWheel";
 import SpringModal from "../ui/SpringModal";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { TbGiftFilled } from "react-icons/tb";
 import { BiHappyHeartEyes } from "react-icons/bi";
+import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
 
 const socket = io.connect(`${process.env.NEXT_PUBLIC_BASEURL_SOCKET}`);
@@ -62,12 +63,30 @@ const SpinWheelArea = ({ data, eventId }) => {
   const [spinover, setSpinover] = useState(false);
   const [eventData, setEventData] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [isUser, setIsUser] = useState(false);
+  const { toast } = useToast();
 
   const handleSpinFinish = (result) => {
     console.log(`Spun to: ${result}`);
     setWinner(result);
     socket.emit("stopSpinWheel", roomId, result);
   };
+
+  useEffect(() => {
+    const checkUserParticipation = async () => {
+      if (user && data && data.creator === user?._id) {
+        setIsUser(true);
+      } else{
+        toast({
+          variant: "destructive",
+          title: `You're not the creator of this event!`,
+          description: `Please Go back or else you'll get a 🍌 - just kidding, you can still join as a participant!`,
+      })
+      }
+    };
+
+    checkUserParticipation();
+  }, [data, user]);
 
   useEffect(() => {
     const fetchParticipants = async () => {
@@ -270,7 +289,7 @@ const SpinWheelArea = ({ data, eventId }) => {
         </section>
       ) : (
         <section className="w-full min-h-screen flex flex-col md:mt-0 mt-10">
-          {isCreator ? null : (
+          {isCreator && isUser ? null : (
             <AlertDialog defaultOpen={true}>
               <AlertDialogContent>
                 <form onSubmit={handleFormSubmit}>
@@ -356,7 +375,7 @@ const SpinWheelArea = ({ data, eventId }) => {
                   />
                 )
               ) : (
-                <div>Please Wait...</div>
+                <div>It seems like, no one joined yet!</div>
               )}
             </div>
             <div className="w-full h-full p-3 dark:bg-[rgba(225,225,225,0.1)] relative bg-[rgba(0,0,0,0.05)] rounded-xl flex flex-col gap-2">

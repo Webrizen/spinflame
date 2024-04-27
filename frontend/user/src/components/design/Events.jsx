@@ -73,7 +73,12 @@ export default function Events() {
     }, []);
 
     // Function to filter events based on search query
-    const filteredEvents = data ? data.filter(event => event.name.toLowerCase().includes(searchQuery.toLowerCase())) : [];
+    const filteredEvents = data
+    ? data.filter((event) => !event.winner && new Date(event.startDate) > new Date())
+           .filter((event) =>
+             event.name.toLowerCase().includes(searchQuery.toLowerCase())
+           )
+    : [];
 
     return (
         <section className='w-full min-h-screen pb-16 pt-12'>

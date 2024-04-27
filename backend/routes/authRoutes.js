@@ -21,7 +21,7 @@ function generateVerificationToken() {
 
 // Function to generate the verification link
 function generateVerificationLink(emailVerificationToken) {
-  return `https://${process.env.DOMAIN}/verify-email?token=${emailVerificationToken}`;
+  return `https://${process.env.DOMAIN}/auth/verify-email?token=${emailVerificationToken}`;
 }
 
 // Register a new user
