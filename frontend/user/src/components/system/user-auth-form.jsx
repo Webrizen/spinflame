@@ -7,10 +7,12 @@ import { Label } from "@/components/ui/label";
 import { FcGoogle } from "react-icons/fc";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export function UserAuthForm({ className, ...props }) {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedRole, setSelectedRole] = useState("creator");
+  const router = useRouter();
 
   const handleRoleChange = (role) => {
     setSelectedRole(role);
@@ -54,9 +56,9 @@ export function UserAuthForm({ className, ...props }) {
         duration: 4000,
         position: 'bottom-center',
       });
-      // Reset loading state after a brief delay (for demo purposes)
+      setIsLoading(false);
       setTimeout(() => {
-        setIsLoading(false);
+        router.push('/dashboard');
       }, 3000);
     } catch (error) {
       // Handle signup errors

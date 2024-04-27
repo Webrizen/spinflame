@@ -11,7 +11,7 @@ export default function RouteGuard({ children }) {
 
     useEffect(() => {
         if (!user) {
-            router.push('/');
+            router.push('/auth');
             toast({
                 variant: "destructive",
                 title: "You're Not Logged In. Please login to access this route.",
