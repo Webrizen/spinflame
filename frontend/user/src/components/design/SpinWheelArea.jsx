@@ -334,14 +334,14 @@ const SpinWheelArea = ({ data, eventId }) => {
             />
             <div
               className={`${
-                isCreator
+                isCreator && isUser
                   ? "cursor-pointer"
                   : "cursor-not-allowed pointer-events-none"
               } w-full h-full flex justify-center items-center md:overflow-visible overflow-auto`}
               onClick={handleStartSelection}
             >
               {participants.length > 0 ? (
-                isCreator ? (
+                isUser && isCreator ? (
                   <SpinningWheel
                     segments={participants}
                     segColors={segColors}
