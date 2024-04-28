@@ -28,7 +28,7 @@ export function RecentSales({ data }) {
             <p className="text-sm font-medium leading-none">
               {event?.winner?.name || "Event not started yet!"}
             </p>
-            <p className="text-sm text-muted-foreground">{event?.name || "Event not started yet!"}</p>
+            <p className="text-sm dark:text-slate-400 text-slate-800">{event?.name || "Event not started yet!"}</p>
           </div>
           <div className={`ml-auto px-3 py-1 rounded-xl text-xs font-medium ${getStatusColor(event?.status)}`}>{event?.status || "N/A"}</div>
         </div>
