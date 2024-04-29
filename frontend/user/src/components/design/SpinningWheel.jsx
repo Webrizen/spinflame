@@ -14,12 +14,13 @@ const SpinningWheel = ({
     buttonText,
     isOnlyOnce = true,
     size = 290,
-    upDuration = 1000,
-    downDuration = 100,
+    upDuration = 2000,
+    downDuration = 500,
     fontFamily = "proxima-nova",
     width = 100,
     height = 100,
-    isCreator
+    isCreator,
+    isUser
 }) => {
     let currentSegment = "";
     let isStarted = false;
@@ -56,14 +57,13 @@ const SpinningWheel = ({
             canvas.setAttribute("id", "canvas");
             document.getElementById("wheel").appendChild(canvas);
         }
-        canvas.addEventListener("click", spin, false);
         canvasContext = canvas.getContext("2d");
-        if (!isCreator) {
+        if (!isCreator && !isUser) {
             canvas.style.pointerEvents = "none";
-          } else {
+        } else {
             canvas.addEventListener("click", spin, false);
-          }
-    };
+        }
+    };    
 
     const audio = new Audio('/spin-sound.mp3');
 

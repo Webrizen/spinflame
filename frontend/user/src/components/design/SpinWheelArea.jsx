@@ -72,8 +72,6 @@ const SpinWheelArea = ({ data, eventId }) => {
     socket.emit("stopSpinWheel", roomId, result);
   };
 
-  console.log(data);
-
   useEffect(() => {
     const checkUserParticipation = async () => {
       if (user && data && data.creator === user?.userId) {
@@ -143,7 +141,9 @@ const SpinWheelArea = ({ data, eventId }) => {
       setSpinover(true);
       setSpinning(false);
       setWinner(winner);
-      setIsOpen(true);
+      setTimeout(() => {
+        setIsOpen(true);
+      }, 4000);
     });
 
     return () => {
@@ -346,7 +346,7 @@ const SpinWheelArea = ({ data, eventId }) => {
           <div className="p-2 md:grid md:grid-cols-[.4fr_1fr_.4fr] md:h-[50vh] flex flex-col justify-center items-center gap-2">
             <div className="w-full h-full px-3 py-4 dark:bg-[rgba(225,225,225,0.1)] relative bg-[rgba(0,0,0,0.05)] rounded-xl flex md:flex-col flex-row md:items-start items-center justify-start gap-2 md:overflow-y-auto overflow-x-auto">
               <div className="w-full flex flex-row justify-between items-center dark:bg-[rgba(225,225,225,0.1)] bg-[rgba(0,0,0,0.1)] border dark:border-[rgba(225,225,225,0.1)] border-[rgba(0,0,0,0.1)] py-2 px-3 rounded-lg sticky top-2 backdrop-blur-3xl md:whitespace-normal whitespace-nowrap">
-                <span>Live 🔴</span>
+                <span className="md:mr-0 mr-3">Live 🔴</span>
                 <div className="text-xs flex flex-row items-center justify-end gap-2">
                   <button
                     onClick={shareEvent}
@@ -413,6 +413,7 @@ const SpinWheelArea = ({ data, eventId }) => {
                     upDuration={50}
                     downDuration={2000}
                     isCreator={isCreator}
+                    isUser={isUser}
                   />
                 ) : (
                   <NonCreatorSpinningWheel
