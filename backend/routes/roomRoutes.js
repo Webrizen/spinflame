@@ -76,6 +76,30 @@ router.get('/:eventId/participants', async (req, res) => {
   }
 });
 
+// Remove a participant from a room by ID
+router.delete('/rooms/:roomId/participants/:participantId', async (req, res) => {
+  try {
+    const { roomId, participantId } = req.params;
+
+    // Find the room by ID
+    const room = await Room.findById(roomId);
+
+    if (!room) {
+      return res.status(404).json({ message: 'Room not found' });
+    }
+
+    // Remove the participant with the specified ID from the room's participants array
+    room.participants = room.participants.filter(participant => participant._id != participantId);
+
+    // Save the updated room
+    await room.save();
+
+    res.status(200).json({ message: 'Participant removed successfully' });
+  } catch (error) {
+    console.error('Error removing participant:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 // Update a room by ID
 router.put('/rooms/:id', async (req, res) => {

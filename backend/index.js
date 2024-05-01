@@ -1,41 +1,41 @@
-require('dotenv').config();
-const express = require('express');
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');;
-const dbConfig = require('./config/db');
-const cors = require('cors');
-const http = require('http');
-const { Server } = require('socket.io');
-const Room = require('./models/Room');
-const User = require('./models/User');
-const authRoute = require('./routes/authRoutes');
-const roomRoutes = require('./routes/roomRoutes');
+require("dotenv").config();
+const express = require("express");
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
+const dbConfig = require("./config/db");
+const cors = require("cors");
+const http = require("http");
+const { Server } = require("socket.io");
+const Room = require("./models/Room");
+const User = require("./models/User");
+const authRoute = require("./routes/authRoutes");
+const roomRoutes = require("./routes/roomRoutes");
 
 const app = express();
 // Allow all origins during development, replace with specific origin in production
 app.use(cors());
 const server = http.createServer(app);
-const frontendOrigin = process.env.FRONTEND || 'http://localhost:3000';
+const frontendOrigin = process.env.FRONTEND || "http://localhost:3000";
 const io = new Server(server, {
   cors: {
     origin: frontendOrigin,
-    methods: ["GET", "POST", "PATCH", "DELETE"]
-  }
+    methods: ["GET", "POST", "PATCH", "DELETE"],
+  },
 });
 const PORT = process.env.PORT || 3001;
 
-app.set('io', io);
+app.set("io", io);
 
-io.on('connection', (socket) => {
+io.on("connection", (socket) => {
   console.log("Connection established.");
 
   // Handle participant joining
-  socket.on('participantJoined', async (roomId, participantName) => {
+  socket.on("participantJoined", async (roomId, participantName) => {
     try {
       // Find the room by ID
       const room = await Room.findById(roomId);
       if (!room) {
-        console.error('Room not found');
+        console.error("Room not found");
         return;
       }
 
@@ -47,34 +47,36 @@ io.on('connection', (socket) => {
 
       // Set the roomId property for the socket
       socket.roomId = roomId;
-      socket.join(roomId)
+      socket.join(roomId);
       // Emit event to notify clients about the updated participant count
-      io.emit('participantJoined', participantName, roomId);
+      io.emit("participantJoined", participantName, roomId);
     } catch (error) {
-      console.error('Error adding participant:', error);
+      console.error("Error adding participant:", error);
     }
   });
 
   // Handle participant leaving
-  socket.on('disconnect', async () => {
+  socket.on("disconnect", async () => {
     try {
       const roomId = socket.roomId;
       if (!roomId) {
-        console.error('Room ID not found in socket.');
+        console.error("Room ID not found in socket.");
         return;
       }
 
       // Find the room by ID
       const room = await Room.findById(roomId);
       if (!room) {
-        console.error('Room not found');
+        console.error("Room not found");
         return;
       }
 
       // Get the socket ID of the disconnected participant
       const disconnectedSocketId = socket.id;
       // Find the index of the participant in the room's participants array using the socket ID
-      const participantIndex = room.participants.findIndex(participant => participant.socketId === disconnectedSocketId);
+      const participantIndex = room.participants.findIndex(
+        (participant) => participant.socketId === disconnectedSocketId
+      );
       if (participantIndex !== -1) {
         // Remove the participant from the room's participants array
         room.participants.splice(participantIndex, 1);
@@ -82,52 +84,82 @@ io.on('connection', (socket) => {
         await room.save();
 
         // Emit event to notify clients about the updated participant count
-        io.to(roomId).emit('participantLeft', room.participants.length);
+        io.to(roomId).emit("participantLeft", room.participants.length);
       }
     } catch (error) {
-      console.error('Error removing participant:', error);
+      console.error("Error removing participant:", error);
     }
   });
 
   // Handle startSpinWheel event from creator
-  socket.on('startSpinWheel', async (roomId) => {
+  socket.on("startSpinWheel", async (roomId) => {
     try {
       // Emit startSpinWheel event to all clients except the creator
-      socket.broadcast.to(roomId).emit('startSpinWheel');
-      await Room.findByIdAndUpdate(roomId, { status: 'started' });
+      socket.broadcast.to(roomId).emit("startSpinWheel");
+      await Room.findByIdAndUpdate(roomId, { status: "started" });
     } catch (error) {
-      console.error('Error handling startSpinWheel event:', error);
+      console.error("Error handling startSpinWheel event:", error);
     }
   });
 
   // Handle stopSpinWheel event from creator
-  socket.on('stopSpinWheel', async (roomId, winner) => {
+  socket.on("stopSpinWheel", async (roomId, winner) => {
     try {
       // Emit stopSpinWheel event to all clients except the creator
-      socket.broadcast.to(roomId).emit('stopSpinWheel', winner);
-      await Room.findByIdAndUpdate(roomId, { status: 'finished', winner: { name: winner } });
+      socket.broadcast.to(roomId).emit("stopSpinWheel", winner);
+      await Room.findByIdAndUpdate(roomId, {
+        status: "finished",
+        winner: { name: winner },
+      });
     } catch (error) {
-      console.error('Error handling stopSpinWheel event:', error);
+      console.error("Error handling stopSpinWheel event:", error);
     }
   });
 
+  // Handle removeParticipant event from creator
+  socket.on("removeParticipant", async (roomId, participantId) => {
+    try {
+      // Find the room by ID
+      const room = await Room.findById(roomId);
+      if (!room) {
+        console.error("Room not found");
+        return;
+      }
 
+      // Find the participant in the room's participants array by ID
+      const participantIndex = room.participants.findIndex(
+        (participant) => participant._id.toString() === participantId
+      );
+      if (participantIndex !== -1) {
+        // Remove the participant from the room's participants array
+        room.participants.splice(participantIndex, 1);
+        // Update the database
+        await room.save();
+
+        // Emit event to notify clients about the removed participant
+        io.to(roomId).emit("participantRemoved", participantId);
+      }
+    } catch (error) {
+      console.error("Error removing participant:", error);
+    }
+  });
 });
 
-mongoose.connect(dbConfig.url, dbConfig.options)
+mongoose
+  .connect(dbConfig.url, dbConfig.options)
   .then(() => {
-    console.log('Connected to MongoDB');
+    console.log("Connected to MongoDB");
   })
   .catch((error) => {
-    console.error('MongoDB connection error:', error);
+    console.error("MongoDB connection error:", error);
     process.exit(1);
   });
 
 app.use(bodyParser.json());
 
 // Welcome route
-app.get('/', (req, res) => {
-  res.send('Welcome to Spinflame! Your source for Events.');
+app.get("/", (req, res) => {
+  res.send("Welcome to Spinflame! Your source for Events.");
 });
 
 app.use("/api/v1/auth", authRoute);

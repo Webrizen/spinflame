@@ -359,7 +359,7 @@ const SpinWheelArea = ({ data, eventId }) => {
                     </span>
                   </button>
                   <span
-                    className="w-[35px] h-[35px] flex justify-center items-center cursor-pointer dark:hover:bg-[rgba(225,225,225,0.1)] hover:bg-[rgba(0,0,0,0.1)] rounded-2xl"
+                    className="w-[35px] h-[35px] flex justify-center items-center cursor-pointer dark:hover:bg-[rgba(225,225,225,0.1)] hover:bg-[rgba(0,0,0,0.1)] rounded-2xl ml-2"
                     title="Copy URL of the Event!"
                     onClick={copyUrl}
                   >
@@ -378,6 +378,29 @@ const SpinWheelArea = ({ data, eventId }) => {
                       />
                     </svg>
                   </span>
+                  {isCreator && isUser ? (
+                    <>
+                      <span
+                        className="w-[35px] h-[35px] flex justify-center items-center cursor-pointer dark:hover:bg-[rgba(225,225,225,0.1)] hover:bg-[rgba(0,0,0,0.1)] rounded-2xl"
+                        title="Remove partcipants!"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-4 h-4"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
+                          />
+                        </svg>
+                      </span>
+                    </>
+                  ) : null}
                 </div>
               </div>
               {participants.map((participant, index) => (
