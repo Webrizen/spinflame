@@ -12,6 +12,14 @@ import {
   AlertDialogFooter,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "../ui/input";
 import { useUserContext } from "@/context/UserContext";
 import { Button } from "../ui/button";
@@ -347,19 +355,29 @@ const SpinWheelArea = ({ data, eventId }) => {
             <div className="w-full h-full px-3 py-4 dark:bg-[rgba(225,225,225,0.1)] relative bg-[rgba(0,0,0,0.05)] rounded-xl flex md:flex-col flex-row md:items-start items-center justify-start gap-2 md:overflow-y-auto overflow-x-auto">
               <div className="w-full flex flex-row justify-between items-center dark:bg-[rgba(225,225,225,0.1)] bg-[rgba(0,0,0,0.1)] border dark:border-[rgba(225,225,225,0.1)] border-[rgba(0,0,0,0.1)] py-2 px-3 rounded-lg sticky top-2 backdrop-blur-3xl md:whitespace-normal whitespace-nowrap">
                 <span className="md:mr-0 mr-3">Live 🔴</span>
-                <div className="text-xs flex flex-row items-center justify-end gap-2">
-                  <button
-                    onClick={shareEvent}
-                    class="relative inline-block px-4 py-2 font-medium group"
-                  >
-                    <span class="absolute inset-0 w-full h-full transition duration-200 ease-out transform translate-x-1 translate-y-1 bg-black group-hover:-translate-x-0 group-hover:-translate-y-0"></span>
-                    <span class="absolute inset-0 w-full h-full bg-white border-2 border-black group-hover:bg-black"></span>
-                    <span class="relative text-black group-hover:text-white">
-                      Share
-                    </span>
-                  </button>
+                <div className="text-xs flex flex-row items-center justify-end">
                   <span
-                    className="w-[35px] h-[35px] flex justify-center items-center cursor-pointer dark:hover:bg-[rgba(225,225,225,0.1)] hover:bg-[rgba(0,0,0,0.1)] rounded-2xl ml-2"
+                    className="w-[35px] h-[35px] flex justify-center items-center cursor-pointer dark:hover:bg-[rgba(225,225,225,0.1)] hover:bg-[rgba(0,0,0,0.1)] rounded-2xl"
+                    title="Copy URL of the Event!"
+                    onClick={shareEvent}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-4 h-4"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"
+                      />
+                    </svg>
+                  </span>
+                  <span
+                    className="w-[35px] h-[35px] flex justify-center items-center cursor-pointer dark:hover:bg-[rgba(225,225,225,0.1)] hover:bg-[rgba(0,0,0,0.1)] rounded-2xl"
                     title="Copy URL of the Event!"
                     onClick={copyUrl}
                   >
@@ -380,25 +398,65 @@ const SpinWheelArea = ({ data, eventId }) => {
                   </span>
                   {isCreator && isUser ? (
                     <>
-                      <span
-                        className="w-[35px] h-[35px] flex justify-center items-center cursor-pointer dark:hover:bg-[rgba(225,225,225,0.1)] hover:bg-[rgba(0,0,0,0.1)] rounded-2xl"
-                        title="Remove partcipants!"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-4 h-4"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
-                          />
-                        </svg>
-                      </span>
+                      <Dialog>
+                        <DialogTrigger>
+                          <span
+                            className="w-[35px] h-[35px] flex justify-center items-center cursor-pointer dark:hover:bg-[rgba(225,225,225,0.1)] hover:bg-[rgba(0,0,0,0.1)] rounded-2xl"
+                            title="Remove partcipants!"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={1.5}
+                              stroke="currentColor"
+                              className="w-4 h-4"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
+                              />
+                            </svg>
+                          </span>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Remove Participants</DialogTitle>
+                            <DialogDescription className="max-h-[50vh] overflow-y-auto">
+                              {participants.map((participant, index) => (
+                                <div
+                                  key={index}
+                                  className="my-3 p-3 rounded-lg dark:bg-[rgba(225,225,225,0.1)] backdrop-blur-lg"
+                                >
+                                  <div className="flex flex-row justify-between items-center gap-4">
+                                    <span>{participant || "No Name"}</span>
+                                    <span
+                                      className="w-[25px] h-[25px] flex justify-center items-center cursor-pointer dark:hover:bg-[rgba(225,225,225,0.1)] hover:bg-[rgba(0,0,0,0.1)] rounded-2xl"
+                                      title="Remove partcipants!"
+                                    >
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={1.5}
+                                        stroke="currentColor"
+                                        className="w-4 h-4"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                                        />
+                                      </svg>
+                                    </span>
+                                  </div>
+                                </div>
+                              ))}
+                            </DialogDescription>
+                          </DialogHeader>
+                        </DialogContent>
+                      </Dialog>
                     </>
                   ) : null}
                 </div>
