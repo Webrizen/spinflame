@@ -67,7 +67,7 @@ router.get('/:eventId/participants', async (req, res) => {
     }
 
     // Extract participant names from the room's participants array
-    const participants = room.participants.map(participant => participant.name);
+    const participants = room.participants.map(participant => participant);
 
     res.json({ participants });
   } catch (error) {
@@ -77,12 +77,12 @@ router.get('/:eventId/participants', async (req, res) => {
 });
 
 // Remove a participant from a room by ID
-router.delete('/rooms/:roomId/participants/:participantId', async (req, res) => {
+router.delete('/rooms/:eventId/participants/:participantId', async (req, res) => {
   try {
-    const { roomId, participantId } = req.params;
+    const { eventId, participantId } = req.params;
 
     // Find the room by ID
-    const room = await Room.findById(roomId);
+    const room = await Room.findById(eventId);
 
     if (!room) {
       return res.status(404).json({ message: 'Room not found' });

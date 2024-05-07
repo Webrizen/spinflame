@@ -119,26 +119,8 @@ io.on("connection", (socket) => {
   // Handle removeParticipant event from creator
   socket.on("removeParticipant", async (roomId, participantId) => {
     try {
-      // Find the room by ID
-      const room = await Room.findById(roomId);
-      if (!room) {
-        console.error("Room not found");
-        return;
-      }
-
-      // Find the participant in the room's participants array by ID
-      const participantIndex = room.participants.findIndex(
-        (participant) => participant._id.toString() === participantId
-      );
-      if (participantIndex !== -1) {
-        // Remove the participant from the room's participants array
-        room.participants.splice(participantIndex, 1);
-        // Update the database
-        await room.save();
-
-        // Emit event to notify clients about the removed participant
-        io.to(roomId).emit("participantRemoved", participantId);
-      }
+      // Emit event to notify clients about the removed participant
+      socket.broadcast.to(roomId).emit("participantRemoved", participantId);
     } catch (error) {
       console.error("Error removing participant:", error);
     }

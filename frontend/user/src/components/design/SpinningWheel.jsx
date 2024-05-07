@@ -144,7 +144,7 @@ const SpinningWheel = ({
 
     const drawSegment = (key, lastAngle, angle) => {
         const ctx = canvasContext;
-        const value = segments[key];
+        const value = segments[key].name;
         ctx.save();
         ctx.beginPath();
         ctx.moveTo(centerX, centerY);
@@ -223,7 +223,7 @@ const SpinningWheel = ({
         ctx.textBaseline = "middle";
         ctx.fillStyle = "transparent";
         ctx.font = "bold 1em " + fontFamily;
-        currentSegment = segments[i];
+        currentSegment = segments[i].name;
         isStarted &&
             ctx.fillText(currentSegment, centerX + 10, centerY + size + 50);
 

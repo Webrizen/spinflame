@@ -65,6 +65,7 @@ const SpinWheelArea = ({ data, eventId }) => {
   const roomId = eventId;
   const { user } = useUserContext();
   const isCreator = user?.role === "creator";
+  const [nameValue, setNameValue] = useState("");
   const [participants, setParticipants] = useState([]);
   const [winner, setWinner] = useState("");
   const [spinning, setSpinning] = useState(false);
@@ -133,14 +134,6 @@ const SpinWheelArea = ({ data, eventId }) => {
       ]);
     });
 
-    socket.on("participantLeft", (participantName) => {
-      setParticipants((prevParticipants) =>
-        prevParticipants.filter(
-          (participant) => participant !== participantName
-        )
-      );
-    });
-
     socket.on("startSpinWheel", (roomId) => {
       setSpinning(true);
     });
@@ -154,11 +147,24 @@ const SpinWheelArea = ({ data, eventId }) => {
       }, 4000);
     });
 
+    socket.on("removeParticipant", (participantId) => {
+      console.log("removeParticipant");
+      // Update local state
+      setParticipants((prevParticipants) =>
+        prevParticipants.filter(
+          (participant) => participant._id !== participantId
+        )
+      );
+
+      // Re-fetch participants from the server
+      fetchParticipants();
+    });
+
     return () => {
       socket.off("participantJoined");
-      socket.off("participantLeft");
       socket.off("startSpinWheel");
       socket.off("startSpinWheel");
+      socket.off("removeParticipant");
     };
   }, [eventId]);
 
@@ -168,8 +174,7 @@ const SpinWheelArea = ({ data, eventId }) => {
 
   const handleFormSubmit = (event) => {
     event.preventDefault();
-    const participantName = event.target.elements.name.value;
-    handleParticipantJoin(participantName);
+    handleParticipantJoin(nameValue);
   };
 
   const handleStartSelection = () => {
@@ -203,6 +208,26 @@ const SpinWheelArea = ({ data, eventId }) => {
     toast({
       title: "URL copied to clipboard!",
     });
+  };
+
+  const deleteParticipant = async (participantId) => {
+    try {
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_BASEURL}/events/rooms/${roomId}/participants/${participantId}`
+      );
+      toast({
+        variant: "success",
+        title: "Participant deleted successfully!",
+      });
+      socket.emit("removeParticipant", roomId, participantId);
+    } catch (error) {
+      console.error("Error deleting participant:", error);
+      toast({
+        variant: "error",
+        title: "Error deleting participant",
+        description: error.message,
+      });
+    }
   };
 
   return (
@@ -243,8 +268,8 @@ const SpinWheelArea = ({ data, eventId }) => {
               <div className="w-full dark:bg-[rgba(225,225,225,0.1)] bg-[rgba(0,0,0,0.1)] border dark:border-[rgba(225,225,225,0.1)] border-[rgba(0,0,0,0.1)] py-2 px-3 rounded-lg sticky top-2 backdrop-blur-3xl md:whitespace-normal whitespace-nowrap">
                 Live 🔴
               </div>
-              {participants.map((participant, index) => (
-                <Audience key={index} name={participant} />
+              {participants?.map((participant, index) => (
+                <Audience key={index} name={participant.name} />
               ))}
             </div>
             <div
@@ -334,6 +359,10 @@ const SpinWheelArea = ({ data, eventId }) => {
                       <Input
                         type="text"
                         name="name"
+                        value={nameValue}
+                        onChange={(e) => {
+                          setNameValue(e.currentTarget.value);
+                        }}
                         placeholder="Enter your name"
                         className="w-full"
                         required
@@ -423,17 +452,20 @@ const SpinWheelArea = ({ data, eventId }) => {
                         <DialogContent>
                           <DialogHeader>
                             <DialogTitle>Remove Participants</DialogTitle>
-                            <DialogDescription className="max-h-[50vh] overflow-y-auto">
-                              {participants.map((participant, index) => (
+                            <DialogDescription className="max-h-[50vh] overflow-y-auto scrollbar-custom">
+                              {participants?.map((participant, index) => (
                                 <div
                                   key={index}
                                   className="my-3 p-3 rounded-lg dark:bg-[rgba(225,225,225,0.1)] backdrop-blur-lg"
                                 >
                                   <div className="flex flex-row justify-between items-center gap-4">
-                                    <span>{participant || "No Name"}</span>
+                                    <span>{participant.name || "No Name"}</span>
                                     <span
-                                      className="w-[25px] h-[25px] flex justify-center items-center cursor-pointer dark:hover:bg-[rgba(225,225,225,0.1)] hover:bg-[rgba(0,0,0,0.1)] rounded-2xl"
+                                      className="w-[35px] h-[35px] flex justify-center items-center cursor-pointer dark:hover:bg-[rgba(225,225,225,0.1)] hover:bg-[rgba(0,0,0,0.1)] rounded-2xl"
                                       title="Remove partcipants!"
+                                      onClick={() =>
+                                        deleteParticipant(participant._id)
+                                      }
                                     >
                                       <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -461,8 +493,8 @@ const SpinWheelArea = ({ data, eventId }) => {
                   ) : null}
                 </div>
               </div>
-              {participants.map((participant, index) => (
-                <Audience key={index} name={participant} />
+              {participants?.map((participant, index) => (
+                <Audience key={index} name={participant.name} />
               ))}
             </div>
             <SpringModal
