@@ -106,11 +106,11 @@ export default function Navbar() {
                                             <AvatarFallback>US</AvatarFallback>
                                         </Avatar>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" className="mb-5">
+                                    <DropdownMenuContent align="end" className="mt-4 space-y-1">
                                         <DropdownMenuLabel>My Account</DropdownMenuLabel>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem><Link href="/dashboard" className="w-full">Dashboard</Link></DropdownMenuItem>
-                                        <DropdownMenuItem><Link href="/dashboard/create-event" className="w-full">Create Event</Link></DropdownMenuItem>
+                                        <DropdownMenuItem><Link href="/dashboard/create-events" className="w-full">Create Event</Link></DropdownMenuItem>
                                         <DropdownMenuItem className="bg-red-50 text-red-400 cursor-pointer" onClick={logout}>Logout</DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
