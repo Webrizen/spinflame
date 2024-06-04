@@ -127,11 +127,11 @@ const SpinWheelArea = ({ data, eventId }) => {
 
     fetchParticipants();
 
-    socket.on("participantJoined", (participantName) => {
-      setParticipants((prevParticipants) => [
-        ...prevParticipants,
-        participantName,
-      ]);
+    socket.on("participantJoined", async (participantName) => {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASEURL}/events/${eventId}/participants`
+      );
+      setParticipants(response.data.participants);
     });
 
     socket.on("startSpinWheel", (roomId) => {
@@ -147,7 +147,7 @@ const SpinWheelArea = ({ data, eventId }) => {
       }, 4000);
     });
 
-    socket.on("removeParticipant", (participantId) => {
+    socket.on("participantRemoved", (participantId) => {
       console.log("removeParticipant");
       // Update local state
       setParticipants((prevParticipants) =>
@@ -164,7 +164,7 @@ const SpinWheelArea = ({ data, eventId }) => {
       socket.off("participantJoined");
       socket.off("startSpinWheel");
       socket.off("startSpinWheel");
-      socket.off("removeParticipant");
+      socket.off("participantRemoved");
     };
   }, [eventId]);
 
@@ -220,6 +220,10 @@ const SpinWheelArea = ({ data, eventId }) => {
         title: "Participant deleted successfully!",
       });
       socket.emit("removeParticipant", roomId, participantId);
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASEURL}/events/${eventId}/participants`
+      );
+      setParticipants(response.data.participants);
     } catch (error) {
       console.error("Error deleting participant:", error);
       toast({
@@ -503,11 +507,10 @@ const SpinWheelArea = ({ data, eventId }) => {
               winner={winner}
             />
             <div
-              className={`${
-                isCreator && isUser
-                  ? "cursor-pointer"
-                  : "cursor-not-allowed pointer-events-none"
-              } w-full h-full flex justify-center items-center md:overflow-visible overflow-auto`}
+              className={`${isCreator && isUser
+                ? "cursor-pointer"
+                : "cursor-not-allowed pointer-events-none"
+                } w-full h-full flex justify-center items-center md:overflow-visible overflow-auto`}
               onClick={handleStartSelection}
             >
               {participants.length > 0 ? (

@@ -144,7 +144,7 @@ const SpinningWheel = ({
 
     const drawSegment = (key, lastAngle, angle) => {
         const ctx = canvasContext;
-        const value = segments[key].name;
+        const value = segments[key]?.name?segments[key].name:'';
         ctx.save();
         ctx.beginPath();
         ctx.moveTo(centerX, centerY);
