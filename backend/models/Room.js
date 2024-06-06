@@ -26,6 +26,9 @@ const roomSchema = new mongoose.Schema({
   description: {
     type: String
   },
+  numberOfSpins: {
+    type: Number
+  },
   winner: {
     name: {
       type: String
