@@ -107,10 +107,20 @@ io.on("connection", (socket) => {
     try {
       // Emit stopSpinWheel event to all clients except the creator
       socket.broadcast.to(roomId).emit("stopSpinWheel", winner);
-      await Room.findByIdAndUpdate(roomId, {
-        status: "finished",
-        winner: { name: winner },
-      });
+      const room = await Room.findOne({ _id: roomId });
+      if (room.numberOfSpins < 5) {
+        await Room.findByIdAndUpdate(roomId, {
+          $inc: { numberOfSpins: 1 },
+          winner: { name: winner },
+        });
+      }
+      else {
+        await Room.findByIdAndUpdate(roomId, {
+          $inc: { numberOfSpins: 1 },
+          status: "finished",
+          winner: { name: winner },
+        });
+      }
     } catch (error) {
       console.error("Error handling stopSpinWheel event:", error);
     }
